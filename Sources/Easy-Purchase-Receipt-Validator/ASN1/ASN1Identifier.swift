@@ -61,4 +61,41 @@ public class ASN1Identifier {
     init(rawValue: UInt8) {
         self.rawValue = rawValue
     }
+    
+    func typeClass() -> Class {
+        for tc in [Class.application, Class.contextSpecific, Class.private] where (rawValue & tc.rawValue) == tc.rawValue {
+            return tc
+        }
+        return .universal
+    }
+    
+    /**
+     Get the 6th digit of the rawvalue. If it's not set then it's primitive
+     */
+    public func isPrimitive() -> Bool {
+        return (rawValue & self.constructedTag) == 0
+    }
+    
+    /**
+     Get the 6th digit of the rawvalue. If it's set then it's constructed
+     */
+    public func isConstructed() -> Bool {
+        return (rawValue & self.constructedTag) != 0
+    }
+    
+    /**
+     Get last 5 digit. As the maximum tag number 0x1E = 00011110. Set upto 5 digit from right.
+     */
+    public func tagNumber() -> TagNumber {
+        return TagNumber(rawValue: rawValue & 0x1F) ?? .endOfContent
+    }
+    
+    public var description: String {
+        if typeClass() == .universal {
+            return String(describing: tagNumber())
+        } else {
+            return "\(typeClass())(\(tagNumber().rawValue))"
+        }
+    }
+    
 }
