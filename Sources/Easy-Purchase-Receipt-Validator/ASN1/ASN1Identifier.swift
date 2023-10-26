@@ -31,7 +31,7 @@ The ASN.1 identifier typically consists of two parts. `Class & Tag. First 2 digi
  last 5 digit = 10000 represent it's a `sequence` type tage as `sequence value is 0x10`
  */
 
-public class ASN1Identifier: CustomStringConvertible {
+public final class ASN1Identifier: CustomStringConvertible {
     public enum Class: UInt8 {
         case universal = 0x00
         case application = 0x40
@@ -79,8 +79,8 @@ public class ASN1Identifier: CustomStringConvertible {
     }
     
     func typeClass() -> Class {
-        for tc in [Class.application, Class.contextSpecific, Class.private] where (rawValue & tc.rawValue) == tc.rawValue {
-            return tc
+        for classType in [Class.application, Class.contextSpecific, Class.private] where (rawValue & classType.rawValue) == classType.rawValue {
+            return classType
         }
         return .universal
     }
@@ -113,5 +113,4 @@ public class ASN1Identifier: CustomStringConvertible {
             return "\(typeClass())(\(tagNumber().rawValue))"
         }
     }
-    
 }

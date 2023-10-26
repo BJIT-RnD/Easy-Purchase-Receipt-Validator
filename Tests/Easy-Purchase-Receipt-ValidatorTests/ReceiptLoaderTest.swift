@@ -17,14 +17,14 @@ final class ReceiptLoaderTest: XCTestCase {
     }
     func test_getReceipt_whenInvalidUrlGiven_shouldReturnInvalidURLError() {
         let url = URL(string: "")
-        receiptLoader?.getReceipt(url) { [weak self] data, error   in
+        receiptLoader?.getReceipt(url) { data, error   in
             XCTAssertEqual(error, ReceiptError.invalidURL, "Error expected to be .invalidURL but found \(String(describing: error))")
             XCTAssertNil(data, "Receipt data expected to be nil but found \(String(describing: data))")
         }
     }
     func test_getReceipt_whenIncorrectValidURLGiven_shouldReturnErrorAsFileNotFound() {
         let url = URL(string: "receipt/fileNotFountURL")
-        receiptLoader?.getReceipt(url) { [weak self] data, error in
+        receiptLoader?.getReceipt(url) { data, error in
             XCTAssertEqual(error, ReceiptError.fileNotFound, "Error expected to be .fileNotFound but found \(String(describing: error))")
             XCTAssertNil(data, "Receipt data expected to be nil but found \(String(describing: data))")
         }
