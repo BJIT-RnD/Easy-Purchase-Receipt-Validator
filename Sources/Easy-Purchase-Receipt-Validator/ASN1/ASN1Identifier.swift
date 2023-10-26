@@ -1,21 +1,37 @@
-//
-//  File.swift
-//  
-//
-//  Created by Admin on 23/10/23.
-//
+/**
+ File Name: ASN1Identifier.swift
+ 
+ Description: This file contains the implementation of the ASN1Identifier class, which is responsible for managing ASN1Identifier class and tags.
+ 
+ Author: Md. Rejaul Hasan
+ 
+ © 2023 BJIT. All rights reserved.
+ */
 
 import Foundation
 /**
  The ASN.1 identifier specifies the data type of the value component within the ASN.1 object. It serves as a way to identify and categorize the data within the ASN1 object.
 
-The ASN.1 identifier typically consists of two parts
+The ASN.1 identifier typically consists of two parts. `Class & Tag. First 2 digit represent class and last 6 digit represent tag`
 - parameters:
- - Class : Specifies the encoding class of the ASN.1 object. The class can have one of the following values
- - Tag : Specifies the type of the ASN.1 object within the class. The tag value is typically a numeric value assigned to a specific data type. For example, the tag value for INTEGER is 2
+ 
+ - `Class` : Specifies the encoding class of the ASN.1 object. The class can have one of the following values. Here you cas see the change of last 2 digit.
+ 
+ case `universal`                 = 0x00       =      `00000000`
+ case `application`             = 0x40      =      `01000000`
+ case `contextSpecific`     = 0x80      =      `10000000`
+ case `private`                      = 0xC0     =     `11000000`
+ 
+ - `Tag` : Specifies the type of the ASN.1 object within the class. The 1st digit in between 6 digit represent the tag type(`Primitive or Constructed`). Last 5 digit represent the actual tag number. The tag value is typically a numeric value assigned to a specific data type. For example, the tag value 2 means the data inside is an integer
+ 
+ - `An Example`: `0X30`
+ binary = `00110000`
+ first 2 digit = 00 represent it's a `universal class`
+ 6th digit from the last = 1 represent it's a `Constructed` tag
+ last 5 digit = 10000 represent it's a `sequence` type tage as `sequence value is 0x10`
  */
 
-public class ASN1Identifier {
+public class ASN1Identifier: CustomStringConvertible {
     public enum Class: UInt8 {
         case universal = 0x00
         case application = 0x40
