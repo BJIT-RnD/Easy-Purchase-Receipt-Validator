@@ -17,7 +17,7 @@ import Foundation
 
  This class is intended to aid in the initial stages of ASN.1 data decoding and can be extended for more advanced ASN.1 parsing functionality.
  */
-public class EasyDecoder {
+public final class EasyDecoder {
     /**
      Decodes ASN.1-encoded data and returns an array of `ASN1DecodableObject` instances.
 

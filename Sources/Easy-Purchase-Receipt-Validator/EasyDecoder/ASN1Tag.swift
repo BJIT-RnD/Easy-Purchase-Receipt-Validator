@@ -22,7 +22,7 @@ import Foundation
 
  This class is essential for interpreting ASN.1 data structures and understanding the nature of ASN.1 tags, making it suitable for data parsing and serialization tasks.
  */
-public class ASN1Tag {
+public final class ASN1Tag {
     let constructedTag: UInt8 = 0x20
     var rawValue: UInt8
 
@@ -72,12 +72,17 @@ public class ASN1Tag {
     }
     // Get the class of the ASN.1 tag
     public func tagClass() -> TypeClass {
-        for typeclass in [TypeClass.application, TypeClass.contextSpecific, TypeClass.private] where (rawValue & typeclass.rawValue) == typeclass.rawValue {
-            return typeclass
+        switch rawValue {
+        case TypeClass.application.rawValue:
+            return .application
+        case TypeClass.contextSpecific.rawValue:
+            return .contextSpecific
+        case TypeClass.private.rawValue:
+            return .private
+        default:
+            return .universal
         }
-        return .universal
     }
-
     // Check if the ASN.1 tag is primitive
     public func isPrimitive() -> Bool {
         return (rawValue & constructedTag) == 0
