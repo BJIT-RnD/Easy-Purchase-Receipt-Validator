@@ -8,6 +8,9 @@
 import Foundation
 /**
  OIDs (Object Identifiers) are a standardized way to uniquely identify objects, attributes, and types in various fields, including cryptography, telecommunications, and information technology. Here's a list of some commonly used OID types
+ 
+ - When you get OID?
+    - In your `ASN1Identifier` if the tag is `.objectIdentifier` Then you will get `OID` from next bytes.
  */
 public enum OID: String {
     case etsiQcsCompliance = "0.4.0.1862.1.1"

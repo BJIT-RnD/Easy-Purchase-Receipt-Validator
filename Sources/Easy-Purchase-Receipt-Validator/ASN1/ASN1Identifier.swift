@@ -86,14 +86,14 @@ public final class ASN1Identifier: CustomStringConvertible {
     }
     
     /**
-     Get the 6th digit of the rawvalue. If it's not set then it's primitive
+     Get the 6th digit of the rawvalue. If it's not set, then it's primitive
      */
     public func isPrimitive() -> Bool {
         return (rawValue & self.constructedTag) == 0
     }
     
     /**
-     Get the 6th digit of the rawvalue. If it's set then it's constructed
+     Get the 6th digit of the rawvalue. If it's set, then it's constructed
      */
     public func isConstructed() -> Bool {
         return (rawValue & self.constructedTag) != 0
