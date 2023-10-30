@@ -9,6 +9,11 @@
  */
 import Foundation
 
+enum ASN1Error: Error {
+    case parseError
+    case outOfBuffer
+}
+
 class ASN1Decoder {
  //
 }
@@ -51,5 +56,26 @@ extension ASN1Decoder {
             return data.uint64Value ?? 0
         }
         return UInt64(firstByte)
+    }
+    /**
+     Responsible to load child content
+     - Parameter:
+        - iterator: Give a start pointer from the asn1 length
+     - Return: Child content as `Data`
+     */
+    func loadChildContent(iterator: inout Data.Iterator) throws -> Data {
+        let len = self.getContentLength(iterator: &iterator)
+        guard len < Int.max else {
+            return Data()
+        }
+        var byteArray: [UInt8] = []
+        for _ in 0..<Int(len) {
+            if let n = iterator.next() {
+                byteArray.append(n)
+            } else {
+                throw ASN1Error.outOfBuffer
+            }
+        }
+        return Data(byteArray)
     }
 }
