@@ -13,10 +13,228 @@ enum ASN1Error: Error {
     case parseError
     case outOfBuffer
 }
+enum ASN1Status: Error {
+    case endOfContent
+}
 
 class ASN1Decoder {
- //
+    /**
+     Return list of ASN1Object from the given data.
+     - Parameters:
+        - data : Give receipt as a data
+     - Returns: List of `ASN1Object`.
+     */
+    func decode(data: Data) throws -> [ASN1Object] {
+        var iterator = data.makeIterator()
+        return try parse(iterator: &iterator)
+    }
+    
+    /**
+     Return list of ASN1Object from the given data.
+     - Parameters:
+        - iterator: Give the initial pointer
+     - Returns: List of `ASN1Object` as an array.
+     */
+    func parse(iterator: inout Data.Iterator) throws -> [ASN1Object] {
+        var result: [ASN1Object] = []
+        while let nextASN1ObjectPointer = iterator.next() {
+            var asn1Object = ASN1Object()
+            asn1Object.identifier = ASN1Identifier(rawValue: nextASN1ObjectPointer)
+            
+            guard let isConstructed = asn1Object.identifier?.isConstructed() else {
+                return result
+            }
+            if isConstructed {
+                let contentData = try loadChildContent(iterator: &iterator)
+                if contentData.isEmpty {
+                    asn1Object.childs = try parse(iterator: &iterator)
+                } else {
+                    var subIterator = contentData.makeIterator()
+                    asn1Object.childs = try parse(iterator: &subIterator)
+                }
+                asn1Object.value = nil
+                asn1Object.rawValue = Data(contentData)
+                asn1Object.childs?.forEach({ $0.parent = asn1Object })
+            }else{
+                if asn1Object.identifier!.typeClass() == .universal {
+                    do{
+                        try self.handleUniversalClassTypeIdentifire(asn1obj: &asn1Object, iterator: &iterator)
+                    }catch _ as ASN1Status {
+                        return result
+                    }
+                }else{
+                    try self.handleOthersClassTypeIdentifire(asn1obj: &asn1Object, atIteratio: &iterator)
+                }
+            }
+            result.append(asn1Object)
+        }
+        return result
+    }
+    
+    /**
+     It will decode `.universal` class type identifire `ASN1Object` and set `value` into this ASN1Object.
+     - Parameters:
+        - asn1obj: Send an `ASN1Object`. It's `rawValue` & `value` property need to be set.
+        - iterator: Give the pointer of the data
+     */
+    private func handleUniversalClassTypeIdentifire(asn1obj: inout ASN1Object, iterator: inout Data.Iterator) throws {
+        var contentData = try loadChildContent(iterator: &iterator)
+        asn1obj.rawValue = Data(contentData)
+        switch asn1obj.identifier!.tagNumber() {
+
+        case .endOfContent:
+            throw ASN1Status.endOfContent
+            
+        case .boolean:
+            if let value = contentData.first {
+                asn1obj.value = value > 0 ? true : false
+            }
+            
+        case .integer:
+            while contentData.first == 0 {
+                contentData.remove(at: 0) // remove all zeros which appear in first
+            }
+            asn1obj.value = contentData
+            
+        case .null:
+            asn1obj.value = nil
+            
+        case .objectIdentifier:
+            asn1obj.value = decodeOid(contentData: &contentData)
+            
+        case .utf8String,
+                .printableString,
+                .numericString,
+                .generalString,
+                .universalString,
+                .characterString,
+                .t61String:
+            
+            asn1obj.value = String(data: contentData, encoding: .utf8)
+            
+        case .bmpString:
+            asn1obj.value = String(data: contentData, encoding: .unicode)
+            
+        case .visibleString,
+                .ia5String:
+            asn1obj.value = String(data: contentData, encoding: .ascii)
+            
+        case .utcTime:
+            asn1obj.value = dateFormatter(contentData: &contentData,
+                                          formats: ["yyMMddHHmmssZ", "yyMMddHHmmZ"])
+            
+        case .generalizedTime:
+            asn1obj.value = dateFormatter(contentData: &contentData,
+                                          formats: ["yyyyMMddHHmmssZ"])
+            
+        case .bitString:
+            if contentData.count > 0 {
+                _ = contentData.remove(at: 0) // unused bits
+            }
+            asn1obj.value = contentData
+            
+        case .octetString:
+            do {
+                var subIterator = contentData.makeIterator()
+                asn1obj.childs = try parse(iterator: &subIterator)
+            } catch {
+                if let str = String(data: contentData, encoding: .utf8) {
+                    asn1obj.value = str
+                } else {
+                    asn1obj.value = contentData
+                }
+            }
+        default:
+            print("unsupported tag: \(asn1obj.identifier!.tagNumber())")
+            asn1obj.value = contentData
+        }
+    }
+    
+    /**
+     It will decode other class type identifire `ASN1Object` and set `value` into this ASN1Object.
+     
+     Here other class type are `.application`, `.contextSpecific`, `.private`
+     - Parameters:
+        - asn1obj: Send an `ASN1Object`. It's `rawValue` & `value` property need to be set.
+        - iterator: Give the pointer of the data
+     */
+    private func handleOthersClassTypeIdentifire(asn1obj: inout ASN1Object, atIteratio iterator: inout Data.Iterator) throws {
+        // custom/private tag
+        let contentData = try loadChildContent(iterator: &iterator)
+        asn1obj.rawValue = Data(contentData)
+        if let str = String(data: contentData, encoding: .utf8) {
+            asn1obj.value = str
+        } else {
+            asn1obj.value = contentData
+        }
+    }
 }
+
+
+extension ASN1Decoder {
+    /**
+     Give the `OID` as data and it will return `OID` as string.
+     
+     The `first byte` represents the first `two` components of the OID.
+     
+     - `The first component is obtained by dividing the byte by 40, and the second component is obtained by taking the remainder when the byte is divided by 40.` These two components are separated by a dot` (".")` and appended to the oid string.
+     
+     - for remaining(2nd to last) bytes calculation:
+     1st bit = 0/1 represent is it `continious` or `end`? `0` means `end` and `1` means `continious`. If it's continious you have to consider the next bit also and so on.
+     `2nd to 8th` bit of the `2nd byte` represent the data
+     `t  << 7` Represent left shift `t` in `7` bit. That means our last `7 bit of t = 0000000`
+     `(n & 0x7F)` Get the `2nd to 8th` bit contents of that byte. As `0x7F = 01111111`
+     now `t = (t << 7) | (n & 0x7F)` , As it's an `or` operator so here we get the previous `t` and new `2nd to 8th bit` data of n
+     `(n & 0x80) == 0`  check the last bit set or not. If it's `0` then it's not continious. If not continious then we apend it and set  `t = 0`
+     
+     - EX:-
+     Suppose you have the encoded OID: `0x2A 0x86 0x48 0xCE 0x3D`, which decodes to the string `"1.2.840.10045.3.1.7"`.
+     let's decode using our function
+     */
+    func decodeOid(contentData: inout Data) -> String? {
+        if contentData.isEmpty {
+            return nil
+        }
+
+        var oid: String = ""
+
+        let first = Int(contentData.remove(at: 0))
+        oid.append("\(first / 40).\(first % 40)")
+
+        var t = 0
+        while contentData.count > 0 {
+            let n = Int(contentData.remove(at: 0))
+            t = (t << 7) | (n & 0x7F)
+            if (n & 0x80) == 0 {
+                oid.append(".\(t)")
+                t = 0
+            }
+        }
+        return oid
+    }
+    
+    /**
+     Give you a formated `date`
+     - Parameters:
+        - contentData: Give the content data
+        - formats: Array of formatted string
+    - Returns: Get back to formatted date
+     */
+    func dateFormatter(contentData: inout Data, formats: [String]) -> Date? {
+        guard let str = String(data: contentData, encoding: .utf8) else { return nil }
+        for format in formats {
+            let fmt = DateFormatter()
+            fmt.locale = Locale(identifier: "en_US_POSIX")
+            fmt.dateFormat = format
+            if let dt = fmt.date(from: str) {
+                return dt
+            }
+        }
+        return nil
+    }
+}
+
+
 
 // MARK: - ASN1Object actual data length
 extension ASN1Decoder {
@@ -58,10 +276,12 @@ extension ASN1Decoder {
         return UInt64(firstByte)
     }
     /**
-     Responsible to load child content
-     - Parameter:
+     Return child content as data
+     
+     give the pointer from the length of the ASN1 object and then it return child ASN1 object
+     - Parameters:
         - iterator: Give a start pointer from the asn1 length
-     - Return: Child content as `Data`
+     - Returns: Child content as `Data`
      */
     func loadChildContent(iterator: inout Data.Iterator) throws -> Data {
         let len = self.getContentLength(iterator: &iterator)

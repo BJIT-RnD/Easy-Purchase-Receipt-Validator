@@ -49,10 +49,9 @@ public final class ASN1Object {
     
     /**
      Try to find child `ASN1Object` for given `index`
-     - Parameter:
-        - index : Int for which you are looking for ASN1Object
-     - Reture:
-        - `ASN1Object` of this `OID`
+     - Parameters:
+        - index: Int for which you are looking for ASN1Object
+     - Returns: `ASN1Object` of this `OID`
      */
     public func childASN1Object(at index: Int) -> ASN1Object? {
         guard let childs = childs,
@@ -66,10 +65,9 @@ public final class ASN1Object {
     
     /**
      Try to find child `ASN1Object` of define `OID`
-     - Parameter:
+     - Parameters:
         - oid : OID for which you are looking for ASN1Object
-     - Reture:
-        - `ASN1Object` of this `OID`
+     - Returns: `ASN1Object` of this `OID`
      */
     public func findASN1Object(of oid: OID) -> ASN1Object? {
         guard let childs = childs else { return nil }
