@@ -23,6 +23,7 @@ import Foundation
  This class is essential for interpreting ASN.1 data structures and understanding the nature of ASN.1 tags, making it suitable for data parsing and serialization tasks.
  */
 public final class ASN1Tag {
+    /// The value 0x20 was used in your specific example as the constructed tag because it corresponds to the binary representation 00100000. This binary representation has the most significant bit set (the leftmost bit is 1), which is a characteristic of constructed tags in ASN.1.
     let constructedTag: UInt8 = 0x20
     var rawValue: UInt8
 
@@ -88,7 +89,9 @@ public final class ASN1Tag {
         return (rawValue & constructedTag) == 0
     }
 
-    // Check if the ASN.1 tag is constructed
+    /// Used to check whether a specific ASN.1 tag is a "constructed" tag or not. In ASN.1 encoding, tags can be either constructed or primitive.
+    ///
+    /// - Returns: Bool. True if the AND is 1, False when the AND is 0
     public func isConstructed() -> Bool {
         return (rawValue & constructedTag) != 0
     }
