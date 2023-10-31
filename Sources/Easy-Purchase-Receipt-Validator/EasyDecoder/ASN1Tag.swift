@@ -26,6 +26,9 @@ public final class ASN1Tag {
     /// The value 0x20 was used in your specific example as the constructed tag because it corresponds to the binary representation 00100000. This binary representation has the most significant bit set (the leftmost bit is 1), which is a characteristic of constructed tags in ASN.1.
     let constructedTag: UInt8 = 0x20
     var rawValue: UInt8
+    var tagNumber: ASN1Tag.Number {
+        return Number(rawValue: rawValue & 0x1F) ?? .endOfContent
+    }
 
     init(rawValue: UInt8) {
         self.rawValue = rawValue
@@ -96,17 +99,53 @@ public final class ASN1Tag {
         return (rawValue & constructedTag) != 0
     }
 
-    // Get the tag number of the ASN.1 tag
-    public func tagNumber() -> Number {
+//    // Get the tag number of the ASN.1 tag
+    public func getTagNumber() -> Number {
         return Number(rawValue: rawValue & 0x1F) ?? .endOfContent
+    }
+    public func isEndOfContent() -> Bool {
+        return tagNumber == .endOfContent
+    }
+    public func isNull() -> Bool {
+        return tagNumber == .null
+    }
+    public func isObjectIdentifier() -> Bool {
+        return tagNumber == .objectIdentifier
+    }
+    public func isInteger() -> Bool {
+        return tagNumber == .integer
+    }
+    public func isBoolean() -> Bool {
+        return tagNumber == .boolean
+    }
+    public func isString() -> Bool {
+        return tagNumber == .utf8String || tagNumber == .printableString || tagNumber == .generalString || tagNumber == .universalString || tagNumber == .characterString || tagNumber == .t61String
+    }
+    public func isBmpString() -> Bool {
+        return tagNumber == .bmpString
+    }
+    public func isVisibleString() -> Bool {
+        return tagNumber == .ia5String || tagNumber == .visibleString
+    }
+    public func isUTCTime() -> Bool {
+        return tagNumber == .utcTime
+    }
+    public func isGeneralizedTime() -> Bool {
+        return  tagNumber == .generalizedTime
+    }
+    public func isBit() -> Bool {
+        return  tagNumber == .bitString
+    }
+    public func isOctect() -> Bool {
+        return  tagNumber == .octetString
     }
 
     // Return a description of the ASN.1 tag
     public var description: String {
         if tagClass() == .universal {
-            return String(describing: tagNumber())
+            return String(describing: tagNumber)
         } else {
-            return "\(tagClass())(\(tagNumber().rawValue))"
+            return "\(tagClass())(\(tagNumber.rawValue))"
         }
     }
 }

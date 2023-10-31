@@ -71,7 +71,7 @@ public final class ASN1DecodableObject: CustomStringConvertible {
     /// - Returns: The sub-object with a matching tag number, or `nil` if not found.
     public func getDecodableObject(by type: String) -> ASN1DecodableObject? {
         for element in subObjects ?? [] {
-            if element.asn1Tag?.tagNumber() == .objectIdentifier {
+            if element.asn1Tag?.getTagNumber() == .objectIdentifier {
                 if element.value as? String == type {
                     return element
                 }
@@ -97,44 +97,40 @@ public final class ASN1DecodableObject: CustomStringConvertible {
         }
         return nil
     }
+
+    /// Checks if the ASN.1 tag of the object is of the universal class.
+    ///
+    /// - Returns: `true` if the tag is of the universal class, otherwise `false`.
+    public func isUniversal() -> Bool {
+        // Ensure that an ASN.1 tag is assigned to the object.
+        guard let asn1Tag else {
+            return false
+        }
+        
+        // Check if the ASN.1 tag's class is .universal.
+        return asn1Tag.tagClass() == .universal
+    }
+
     
     /// This function generates an ASN.1 representation of data in a hierarchical manner.
     ///
     /// - Parameter insets: An optional parameter used to control the indentation of the ASN.1 output.
 
     private func getASN1(insets: String = "") -> String {
-        // Initialize an empty string to store the ASN.1 representation.
         var output = insets
-        
-        // Append the tag description (if available) to the output.
-        if let tagDescription = asn1Tag?.description.uppercased() {
-            output.append(tagDescription)
-        }
-        
-        // Append the value (if available) to the output, along with additional information for certain data types.
-        if let value = value {
-            output.append(": \(value)")
-            
-            // If the tag is of universal class and represents an object identifier, add the type name to the output.
-            if let asn1Tag = asn1Tag, asn1Tag.tagClass() == .universal, asn1Tag.tagNumber() == .objectIdentifier, let typeName = ASN1ObjectType.getTypeName(of: value as? String ?? "") {
-                output.append(" (\(typeName))")
+        output.append(asn1Tag?.description.uppercased() ?? "")
+        output.append(value != nil ? ": \(value!)" : "")
+        if asn1Tag?.tagClass() == .universal, asn1Tag?.getTagNumber() == .objectIdentifier {
+            if let oidName = ASN1ObjectType.getTypeName(of: value as? String ?? "") {
+                output.append(" (\(oidName))")
             }
         }
-        
-        // If there are subobjects (nested ASN.1 data), add them to the output in a structured manner.
-        if let subObjects = subObjects, !subObjects.isEmpty {
-            output.append(" {")
-            output.append("\n")
-            
-            // Recursively call the function for each subobject, adjusting the indentation.
-            for item in subObjects {
-                output.append(item.getASN1(insets: insets + "    "))
-            }
-            
-            output.append(insets + "}\n")
+        output.append(subObjects != nil && !subObjects!.isEmpty ? " {" : "")
+        output.append("\n")
+        for item in subObjects ?? [] {
+            output.append(item.getASN1(insets: insets + "    "))
         }
-        
-        // Return the final ASN.1 representation as a formatted string.
+        output.append(subObjects != nil && !subObjects!.isEmpty ? insets + "}\n" : "")
         return output
     }
 }
