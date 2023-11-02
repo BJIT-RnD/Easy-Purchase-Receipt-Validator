@@ -11,6 +11,8 @@ import Foundation
  
  - When you get OID?
     - In your `ASN1Identifier` if the tag is `.objectIdentifier` Then you will get `OID` from next bytes.
+ - How to get the list of below OID?
+    - Here is the document for it. http://www.oid-info.com/index.htm. Visit the `tree display` tab. You get all the data.
  */
 public enum OID: String {
     case etsiQcsCompliance = "0.4.0.1862.1.1"
