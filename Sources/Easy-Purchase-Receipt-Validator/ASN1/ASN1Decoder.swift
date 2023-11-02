@@ -12,12 +12,14 @@ import Foundation
 enum ASN1Error: Error {
     case parseError
     case outOfBuffer
+    case lengthEncodingError
+    case childContentEncodingError
 }
 enum ASN1Status: Error {
     case endOfContent
 }
 
-class ASN1Decoder {
+public class ASN1Decoder {
     /**
      Return list of ASN1Object from the given data.
      - Parameters:
@@ -58,7 +60,7 @@ class ASN1Decoder {
             }else{
                 if asn1Object.identifier!.typeClass() == .universal {
                     do{
-                        try self.handleUniversalClassTypeIdentifire(asn1obj: &asn1Object, iterator: &iterator)
+                        try self.handleUniversalClassTypeIdentifire(asn1obj: &asn1Object, atIteratio: &iterator)
                     }catch _ as ASN1Status {
                         return result
                     }
@@ -77,7 +79,7 @@ class ASN1Decoder {
         - asn1obj: Send an `ASN1Object`. It's `rawValue` & `value` property need to be set.
         - iterator: Give the pointer of the data
      */
-    private func handleUniversalClassTypeIdentifire(asn1obj: inout ASN1Object, iterator: inout Data.Iterator) throws {
+    private func handleUniversalClassTypeIdentifire(asn1obj: inout ASN1Object, atIteratio iterator: inout Data.Iterator) throws {
         var contentData = try loadChildContent(iterator: &iterator)
         asn1obj.rawValue = Data(contentData)
         switch asn1obj.identifier!.tagNumber() {
@@ -159,14 +161,9 @@ class ASN1Decoder {
         - iterator: Give the pointer of the data
      */
     private func handleOthersClassTypeIdentifire(asn1obj: inout ASN1Object, atIteratio iterator: inout Data.Iterator) throws {
-        // custom/private tag
         let contentData = try loadChildContent(iterator: &iterator)
         asn1obj.rawValue = Data(contentData)
-        if let str = String(data: contentData, encoding: .utf8) {
-            asn1obj.value = str
-        } else {
-            asn1obj.value = contentData
-        }
+        asn1obj.value = String(data: contentData, encoding: .utf8) != nil ? String(data: contentData, encoding: .utf8) : contentData
     }
 }
 
@@ -188,7 +185,7 @@ extension ASN1Decoder {
      `(n & 0x80) == 0`  check the last bit set or not. If it's `0` then it's not continious. If not continious then we apend it and set  `t = 0`
      
      - EX:-
-     Suppose you have the encoded OID: `0x2A 0x86 0x48 0xCE 0x3D`, which decodes to the string `"1.2.840.10045.3.1.7"`.
+     Suppose you have the encoded OID: `0x60, 0x86, 0x48, 0x1, 0x65, 0x3, 0x4, 0x2, 0x1`, which decodes to the string `"2.16.840.1.101.3.4.2.1"`.
      let's decode using our function
      */
     func decodeOid(contentData: inout Data) -> String? {
@@ -258,7 +255,7 @@ extension ASN1Decoder {
      
      So, in the code `let octetsToRead = first! - 0x80`, the subtraction of `0x80` is a way to extract the count of additional bytes used in the `long` form to represent the `length`. This value (`octetsToRead`) is then used to read the actual bytes representing the `length` from the iterator.
      */
-    func getContentLength(iterator: inout Data.Iterator) -> UInt64 {
+    func getContentLength(iterator: inout Data.Iterator) throws -> UInt64 {
         let firstByte = iterator.next()
         guard let firstByte = firstByte else {
             return 0
@@ -269,6 +266,8 @@ extension ASN1Decoder {
             for _ in 0..<octetsToRead {
                 if let n = iterator.next() {
                     data.append(n)
+                }else{
+                    throw ASN1Error.lengthEncodingError
                 }
             }
             return data.uint64Value ?? 0
@@ -284,7 +283,7 @@ extension ASN1Decoder {
      - Returns: Child content as `Data`
      */
     func loadChildContent(iterator: inout Data.Iterator) throws -> Data {
-        let len = self.getContentLength(iterator: &iterator)
+        let len = try self.getContentLength(iterator: &iterator)
         guard len < Int.max else {
             return Data()
         }
@@ -297,5 +296,21 @@ extension ASN1Decoder {
             }
         }
         return Data(byteArray)
+    }
+}
+
+
+/**
+ 
+ Unit test
+ 
+ */
+extension ASN1Decoder{
+    func test_handleOthersClassTypeIdentifire(asn1obj: inout ASN1Object, atIteratio iterator: inout Data.Iterator) throws {
+        try handleOthersClassTypeIdentifire(asn1obj: &asn1obj, atIteratio: &iterator)
+    }
+    
+    func test_handleUniversalClassTypeIdentifire(asn1obj: inout ASN1Object, iterator: inout Data.Iterator) throws {
+        try handleUniversalClassTypeIdentifire(asn1obj: &asn1obj, atIteratio: &iterator)
     }
 }
