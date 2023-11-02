@@ -57,14 +57,14 @@ public class ASN1Decoder {
                 asn1Object.value = nil
                 asn1Object.rawValue = Data(contentData)
                 asn1Object.childs?.forEach({ $0.parent = asn1Object })
-            }else{
-                if asn1Object.identifier!.typeClass() == .universal {
-                    do{
+            } else {
+                if asn1Object.identifier?.typeClass() == .universal {
+                    do {
                         try self.handleUniversalClassTypeIdentifire(asn1obj: &asn1Object, atIteratio: &iterator)
-                    }catch _ as ASN1Status {
+                    } catch _ as ASN1Status {
                         return result
                     }
-                }else{
+                } else {
                     try self.handleOthersClassTypeIdentifire(asn1obj: &asn1Object, atIteratio: &iterator)
                 }
             }
@@ -82,8 +82,7 @@ public class ASN1Decoder {
     private func handleUniversalClassTypeIdentifire(asn1obj: inout ASN1Object, atIteratio iterator: inout Data.Iterator) throws {
         var contentData = try loadChildContent(iterator: &iterator)
         asn1obj.rawValue = Data(contentData)
-        switch asn1obj.identifier!.tagNumber() {
-
+        switch asn1obj.identifier?.tagNumber() {
         case .endOfContent:
             throw ASN1Status.endOfContent
             
@@ -122,15 +121,13 @@ public class ASN1Decoder {
             asn1obj.value = String(data: contentData, encoding: .ascii)
             
         case .utcTime:
-            asn1obj.value = dateFormatter(contentData: &contentData,
-                                          formats: ["yyMMddHHmmssZ", "yyMMddHHmmZ"])
+            asn1obj.value = dateFormatter(contentData: &contentData, formats: ["yyMMddHHmmssZ", "yyMMddHHmmZ"])
             
         case .generalizedTime:
-            asn1obj.value = dateFormatter(contentData: &contentData,
-                                          formats: ["yyyyMMddHHmmssZ"])
+            asn1obj.value = dateFormatter(contentData: &contentData, formats: ["yyyyMMddHHmmssZ"])
             
         case .bitString:
-            if contentData.count > 0 {
+            if !contentData.isEmpty {
                 _ = contentData.remove(at: 0) // unused bits
             }
             asn1obj.value = contentData
@@ -147,7 +144,7 @@ public class ASN1Decoder {
                 }
             }
         default:
-            print("unsupported tag: \(asn1obj.identifier!.tagNumber())")
+            // print("unsupported tag: \(asn1obj.identifier!.tagNumber())")
             asn1obj.value = contentData
         }
     }
@@ -199,7 +196,7 @@ extension ASN1Decoder {
         oid.append("\(first / 40).\(first % 40)")
 
         var t = 0
-        while contentData.count > 0 {
+        while !contentData.isEmpty {
             let n = Int(contentData.remove(at: 0))
             t = (t << 7) | (n & 0x7F)
             if (n & 0x80) == 0 {
@@ -266,7 +263,7 @@ extension ASN1Decoder {
             for _ in 0..<octetsToRead {
                 if let n = iterator.next() {
                     data.append(n)
-                }else{
+                } else {
                     throw ASN1Error.lengthEncodingError
                 }
             }
@@ -300,12 +297,8 @@ extension ASN1Decoder {
 }
 
 
-/**
- 
- Unit test
- 
- */
-extension ASN1Decoder{
+// MARK: Extension for unit test
+extension ASN1Decoder {
     func test_handleOthersClassTypeIdentifire(asn1obj: inout ASN1Object, atIteratio iterator: inout Data.Iterator) throws {
         try handleOthersClassTypeIdentifire(asn1obj: &asn1obj, atIteratio: &iterator)
     }
