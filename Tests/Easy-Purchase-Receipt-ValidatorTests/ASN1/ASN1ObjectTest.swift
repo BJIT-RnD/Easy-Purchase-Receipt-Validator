@@ -15,6 +15,7 @@ final class ASN1ObjectTest: XCTestCase {
     private var sut: ASN1Object!
     override func setUp() {
         super.setUp()
+        self.initialSetup(with: [0x0C, 0x0D, 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x2C, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64, 0x21 ])
     }
     
     override func tearDown() {
@@ -68,13 +69,13 @@ final class ASN1ObjectTest: XCTestCase {
     0x01 0x01 0xFF   ; Boolean (TRUE)
     0x06, 0x09, 0x60, 0x86, 0x48, 0x1, 0x65, 0x3, 0x4, 0x2, 0x1, OID (sha256 = "2.16.840.1.101.3.4.2.1")
  */
-extension ASN1ObjectTest{
+extension ASN1ObjectTest {
     func initialSetup(with data: [UInt8]) {
         let decoder = ASN1Decoder()
         let data = Data(data)
         do {
             let asn1ObjectList = try decoder.decode(data: data)
             self.sut = asn1ObjectList.first
-        }catch _ {}
+        } catch _ {}
     }
 }
