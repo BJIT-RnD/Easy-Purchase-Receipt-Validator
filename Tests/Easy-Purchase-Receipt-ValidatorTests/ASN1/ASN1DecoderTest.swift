@@ -29,8 +29,12 @@ final class ASN1IDecoderTest: XCTestCase {
     }
     func test_getContentLength_GivenLengthAs8_Expect_8() {
         var iterator = initialSetup(with: [0x08, 0x02, 0x01, 0x42, 0x04, 0x03, 0x61, 0x62, 0x63])
-        let asn1Length = try! sut.getContentLength(iterator: &iterator)
-        XCTAssertEqual(Int(asn1Length), 8, "Expected 8 but get \(Int(asn1Length))")
+        do {
+            let asn1Length = try sut.getContentLength(iterator: &iterator)
+            XCTAssertEqual(Int(asn1Length), 8, "Expected 8 but get \(Int(asn1Length))")
+        } catch {
+            XCTFail("An error occure \(error)")
+        }
     }
     func test_getContentLength_Given7ByteLongLength_Expect_564333000221026() {
         var iterator = initialSetup(with: [0x87, 0x02, 0x01, 0x42, 0x04, 0x03, 0x61, 0x62, 0x63])
