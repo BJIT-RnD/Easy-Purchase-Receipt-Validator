@@ -73,65 +73,10 @@ public final class EasyDecoder {
                 tempObj.rawValue = Data(contents)
                 
                 // Get the ASN.1 tag of the object.
-                guard let tag = tempObj.asn1Tag else {
+                guard let tagNumber = tempObj.asn1Tag else {
                     return decodableObjects
                 }
-                
-                // Check the type of the universal tag and perform specific decoding.
-                if tag.isEndOfContent() {
-                    return decodableObjects
-                } else if tag.isNull() {
-                    tempObj.value = nil
-                } else if tag.isBoolean() {
-                    if let value = contents.first {
-                        tempObj.value = value > 0 ? true : false
-                    }
-                } else if tag.isObjectIdentifier() {
-                    // Decode the content as an Object Identifier (OID).
-                    tempObj.value = decodeOid(contentData: &contents)
-                } else if tag.isInteger() {
-                    // Remove leading zero bytes for integers.
-                    while contents.first == 0 {
-                        contents.remove(at: 0)
-                    }
-                    tempObj.value = contents
-                } else if tag.isString() {
-                    // Decode the content as a string using UTF-8 encoding.
-                    tempObj.value = String(data: contents, encoding: .utf8)
-                } else if tag.isBmpString() {
-                    // Decode the content as a BMP string and convert it to Unicode.
-                    tempObj.value = String(data: contents, encoding: .unicode)
-                } else if tag.isVisibleString() {
-                    // Decode the content as a visible string and convert it to ASCII.
-                    tempObj.value = String(data: contents, encoding: .ascii)
-                } else if tag.isUTCTime() {
-                    // Decode the content as a UTC time and parse it using specified date formats.
-                    tempObj.value = dateFormatter(contentData: &contents,
-                                                  formats: ["yyMMddHHmmssZ", "yyMMddHHmmZ"])
-                } else if tag.isGeneralizedTime() {
-                    // Decode the content as a generalized time and parse it using a specific date format.
-                    tempObj.value = dateFormatter(contentData: &contents, formats: ["yyyyMMddHHmmssZ"])
-                } else if tag.isBit() {
-                    if !contents.isEmpty {
-                        _ = contents.remove(at: 0) // Remove unused bits.
-                    }
-                    tempObj.value = contents
-                } else if tag.isOctect() {
-                    do {
-                        // Process octet strings with recursive subobject decoding.
-                        var subIterator = contents.makeIterator()
-                        tempObj.subObjects = try process(iterator: &subIterator)
-                    } catch {
-                        if let str = String(data: contents, encoding: .utf8) {
-                            tempObj.value = str
-                        } else {
-                            tempObj.value = contents
-                        }
-                    }
-                } else {
-                    // Handle other cases by storing the contents as the value.
-                    tempObj.value = contents
-                }
+                // Implementation needed to check tag number and take appropriate action [Work in Progress]
             } else {
                 // Handle non-universal tags by storing the contents as the value.
                 let contents = try decodeContents(iterator: &iterator)

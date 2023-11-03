@@ -2,7 +2,19 @@
 
 import Foundation
 
+/**
+ `ASN1ObjectType` represents a set of predefined ASN.1 object type values, often used in X.509 certificates and other security-related contexts.
+
+ Key Properties:
+ - Each case in this enum represents a specific ASN.1 object type with its associated Object Identifier (OID).
+
+ Methods:
+ - `getTypeName(of value: String)`: Get the ASN.1 object type name for a given OID.
+
+ This enum is useful for mapping OID values to their human-readable names in security and cryptography-related applications.
+ */
 public enum ASN1ObjectType: String {
+    // Define ASN.1 object type cases and their associated OIDs
     case etsiQcsCompliance = "0.4.0.1862.1.1"
     case etsiQcsRetentionPeriod = "0.4.0.1862.1.3"
     case etsiQcsQcSSCD = "0.4.0.1862.1.4"
@@ -80,9 +92,10 @@ public enum ASN1ObjectType: String {
     case givenName = "2.5.4.42"
     case dnQualifier = "2.5.4.46"
     
-    /// Get the ASN.1 object type name
+    /// Get the ASN.1 object type name for a given OID.
     ///
-    /// - Returns: The type name
+    /// - Parameter value: The OID value for which to retrieve the name.
+    /// - Returns: The human-readable name of the ASN.1 object type or nil if not found.
     static func getTypeName(of value: String) -> String? {
         if let type = ASN1ObjectType(rawValue: value) {
             return "\(type)"

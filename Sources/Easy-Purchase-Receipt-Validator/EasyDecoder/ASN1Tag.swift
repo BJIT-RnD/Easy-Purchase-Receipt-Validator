@@ -103,40 +103,63 @@ public final class ASN1Tag {
     public func getTagNumber() -> Number {
         return Number(rawValue: rawValue & 0x1F) ?? .endOfContent
     }
+    // Check if the ASN.1 tag represents an "End Of Content" tag
     public func isEndOfContent() -> Bool {
         return tagNumber == .endOfContent
     }
+
+    // Check if the ASN.1 tag represents a "Null" tag
     public func isNull() -> Bool {
         return tagNumber == .null
     }
+
+    // Check if the ASN.1 tag represents an "Object Identifier" tag
     public func isObjectIdentifier() -> Bool {
         return tagNumber == .objectIdentifier
     }
+
+    // Check if the ASN.1 tag represents an "Integer" tag
     public func isInteger() -> Bool {
         return tagNumber == .integer
     }
+
+    // Check if the ASN.1 tag represents a "Boolean" tag
     public func isBoolean() -> Bool {
         return tagNumber == .boolean
     }
+
+    // Check if the ASN.1 tag represents a string type (UTF-8, printable, general, universal, character, T.61)
     public func isString() -> Bool {
         return tagNumber == .utf8String || tagNumber == .printableString || tagNumber == .generalString || tagNumber == .universalString || tagNumber == .characterString || tagNumber == .t61String
     }
+
+    // Check if the ASN.1 tag represents a "BMP String" tag
     public func isBmpString() -> Bool {
         return tagNumber == .bmpString
     }
+
+    // Check if the ASN.1 tag represents a string type (IA5 or Visible)
     public func isVisibleString() -> Bool {
         return tagNumber == .ia5String || tagNumber == .visibleString
     }
+
+    // Check if the ASN.1 tag represents a "UTC Time" tag
     public func isUTCTime() -> Bool {
         return tagNumber == .utcTime
     }
+
+    // Check if the ASN.1 tag represents a "Generalized Time" tag
     public func isGeneralizedTime() -> Bool {
         return  tagNumber == .generalizedTime
     }
+
+    // Check if the ASN.1 tag represents a "Bit String" tag
     public func isBit() -> Bool {
         return  tagNumber == .bitString
     }
-    public func isOctect() -> Bool {
+
+    // Check if the ASN.1 tag represents an "Octet String" tag
+    public func isOctet() -> Bool {
         return  tagNumber == .octetString
     }
 
