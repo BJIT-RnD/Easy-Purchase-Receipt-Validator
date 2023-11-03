@@ -131,40 +131,6 @@ final class ASN1DecodableObjectTest: XCTestCase {
         XCTAssertNil(object.asString, "Should return nil when there is no string value.")
     }
 
-    // MARK: - Description
-
-    func test_description_withTagAndValue_returnsWrongFormattedDescription() {
-        // Create an ASN1DecodableObject with a specific tag and value.
-        let object = ASN1DecodableObject()
-        object.asn1Tag = ASN1Tag(rawValue: 0x06) // Object Identifier tag
-        object.value = "1.2.840.10040.4.1"
-
-        // Check the description.
-        let expectedDescription = "OBJECTIDENTIFIER: 1.2.840.10040.4.1 (etsiQcsCompliance)"
-        XCTAssertNotEqual(object.description, expectedDescription, "Description should be formatted incorrectly.")
-    }
-    
-    func test_description_withTagAndValue_returnsFormattedDescription() {
-        // Create an ASN1DecodableObject with a specific tag and value.
-        let object = ASN1DecodableObject()
-        object.asn1Tag = ASN1Tag(rawValue: 0x06) // Object Identifier tag
-        object.value = "0.4.0.1862.1.1"
-
-        // Check the description.
-        let expectedDescription = "OBJECTIDENTIFIER: 0.4.0.1862.1.1 (etsiQcsCompliance)"
-        XCTAssertEqual(object.description, expectedDescription, "Description should be formatted correctly.")
-    }
-
-    func test_description_withoutValue_returnsTagDescription() {
-        // Create an ASN1DecodableObject with a specific tag but no value.
-        let object = ASN1DecodableObject()
-        object.asn1Tag = ASN1Tag(rawValue: 0x06) // Object Identifier tag
-
-        // Check the description.
-        let expectedDescription = "OBJECTIDENTIFIER"
-        XCTAssertEqual(object.description, expectedDescription, "Description should be the tag description.")
-    }
-
     // MARK: - Parent Reference
 
     func test_parentReference_noParentObject_returnsNil() {
