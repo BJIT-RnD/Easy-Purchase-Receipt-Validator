@@ -261,8 +261,8 @@ extension ASN1Decoder {
             let octetsToRead = firstByte - 0x80
             var data = Data()
             for _ in 0..<octetsToRead {
-                if let n = iterator.next() {
-                    data.append(n)
+                if let singleData = iterator.next() {
+                    data.append(singleData)
                 } else {
                     throw ASN1Error.lengthEncodingError
                 }

@@ -28,7 +28,7 @@ public final class ASN1Object {
     /// This property contains ASN1 decoded Swift object whenever is possible
     public var value: Any?
     /// Hold reference of child ASN1Objects
-    var childs: [ASN1Object]?
+    public var childs: [ASN1Object]?
     /// Hold the reference of parent ASN1Object
     public internal(set) weak var parent: ASN1Object?
     public var description: String {
