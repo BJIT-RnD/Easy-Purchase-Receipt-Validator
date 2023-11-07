@@ -77,7 +77,9 @@ public final class ASN1Identifier: CustomStringConvertible {
     init(rawValue: UInt8) {
         self.rawValue = rawValue
     }
-    
+    /**
+     It will return the class type.
+     */
     func typeClass() -> Class {
         for classType in [Class.application, Class.contextSpecific, Class.private] where (rawValue & classType.rawValue) == classType.rawValue {
             return classType
