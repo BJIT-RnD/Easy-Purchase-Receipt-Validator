@@ -7,7 +7,6 @@
 
 import Foundation
 extension AppleContainer {
-    
     // MARK: - Enum for Receipt Fields
     
     enum receiptFields: UInt64 {
@@ -183,5 +182,4 @@ extension AppleContainer {
         // Return the populated PurchaseData object containing in-app purchase information.
         return inAppPurchaseData
     }
-
 }
