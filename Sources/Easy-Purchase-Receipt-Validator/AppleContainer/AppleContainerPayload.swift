@@ -18,8 +18,23 @@ extension AppleContainer {
         case appVersion = 19
         case createdDate = 12
         case expireDate = 21
+        case inAppPurchase = 17
     }
-    
+    // Reference and tag taken from: https://developer.apple.com/library/archive/releasenotes/General/ValidateAppStoreReceipt/Chapters/ReceiptFields.html
+
+    enum purchaseFields: UInt64 {
+        case quantities = 1701
+        case productIdentifier = 1702
+        case transactionId = 1703
+        case originalTransactionId = 1705
+        case purchaseDate = 1704
+        case originalPurchaseDate = 1706
+        case expireDate = 1708
+        case isIntroPeriod = 1719
+        case cancellationDate = 1712
+        case webOrderLine = 1711
+    }
+
     // MARK: - Date Processing
     
     /// Processes a date string and returns a Date object if parsing is successful.
@@ -81,6 +96,13 @@ extension AppleContainer {
                 payloadData.receiptExpirationDateString = fieldValueString
                 payloadData.receiptExpirationDate = processDate(fieldValueString)
 
+            case receiptFields.inAppPurchase.rawValue:
+                let subItems = field.childASN1Object(at: 2)?.childs?.first?.childs ?? []
+                if payloadData.inAppPurchasesReceipt == nil {
+                    payloadData.inAppPurchasesReceipt = []
+                }
+                payloadData.inAppPurchasesReceipt?.append(inAppPurchase(subItems))
+
             default:
                 break
             }
@@ -89,5 +111,77 @@ extension AppleContainer {
         // Return the PayloadData object containing the extracted information.
         return payloadData
     }
-}
 
+    private func inAppPurchase(_ subItems: [ASN1Object]) -> PurchaseData {
+        // Initialize the PurchaseData structure to hold in-app purchase information.
+        var inAppPurchaseData = PurchaseData()
+
+        // Iterate through each sub-item in the provided list.
+        for subItem in subItems {
+            // Retrieve the field type from the sub-item, considering it as an ASN.1 structure.
+            let fieldType = (subItem.childASN1Object(at: 0)?.value as? Data)?.uint64Value ?? 0
+
+            // Extract the field value from the sub-item structure.
+            let fieldValue = subItem.childASN1Object(at: 2)?.childs?.first?.value
+
+            // Switch statement to process and update the PurchaseData properties based on the field type.
+            switch fieldType {
+                // Quantity of the in-app purchase.
+                case purchaseFields.quantities.rawValue:
+                    inAppPurchaseData.quantities = (fieldValue as? Data)?.uint64Value
+
+                // Product identifier of the in-app purchase.
+                case purchaseFields.productIdentifier.rawValue:
+                    inAppPurchaseData.productIdentifier = fieldValue as? String
+
+                // Transaction ID of the in-app purchase.
+                case purchaseFields.transactionId.rawValue:
+                    inAppPurchaseData.transactionId = fieldValue as? String
+
+                // Original transaction ID of the in-app purchase.
+                case purchaseFields.originalTransactionId.rawValue:
+                    inAppPurchaseData.originalTransactionId = fieldValue as? String
+
+                // Purchase date of the in-app purchase.
+                case purchaseFields.purchaseDate.rawValue:
+                    if let fieldValueString = fieldValue as? String {
+                        inAppPurchaseData.purchaseDate = processDate(fieldValueString)
+                    }
+
+                // Original purchase date of the in-app purchase.
+                case purchaseFields.originalPurchaseDate.rawValue:
+                    if let fieldValueString = fieldValue as? String {
+                        inAppPurchaseData.originalPurchaseDate = processDate(fieldValueString)
+                    }
+
+                // Expiration date of the in-app purchase.
+                case purchaseFields.expireDate.rawValue:
+                    if let fieldValueString = fieldValue as? String {
+                        inAppPurchaseData.expiresDate = processDate(fieldValueString)
+                    }
+
+                // Indicates if the in-app purchase is in an introductory offer period.
+                case purchaseFields.isIntroPeriod.rawValue:
+                    inAppPurchaseData.isInIntroOfferPeriod = (fieldValue as? Data)?.uint64Value
+
+                // Cancellation date of the in-app purchase.
+                case purchaseFields.cancellationDate.rawValue:
+                    if let fieldValueString = fieldValue as? String {
+                        inAppPurchaseData.cancellationDate = processDate(fieldValueString)
+                    }
+
+                // Web order line item ID of the in-app purchase.
+                case purchaseFields.webOrderLine.rawValue:
+                    inAppPurchaseData.webOrderLineItemId = (fieldValue as? Data)?.uint64Value
+
+                // Default case for unhandled field types.
+                default:
+                    break
+            }
+        }
+
+        // Return the populated PurchaseData object containing in-app purchase information.
+        return inAppPurchaseData
+    }
+
+}

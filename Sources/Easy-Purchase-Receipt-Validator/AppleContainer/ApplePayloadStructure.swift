@@ -36,7 +36,7 @@ public struct PayloadData {
 
     /// A string representation of the receipt expiration date, which may be useful for human-readable presentation.
     public var receiptExpirationDateString: String?
-    public var inAppPurchases: [PurchaseData]?
+    public var inAppPurchasesReceipt: [PurchaseData]?
 }
 
 public struct PurchaseData {
