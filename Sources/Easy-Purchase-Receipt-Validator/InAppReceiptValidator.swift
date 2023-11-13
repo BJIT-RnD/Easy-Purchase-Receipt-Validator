@@ -1,46 +1,28 @@
 //
-//  InAppReceipt.swift
+//  InAppReceiptValidator.swift
 //
 //
 //  Created by BJIT on 9/11/23.
 //
 
 import Foundation
-// MARK: - ReceiptInfo Struct
-
-/// A structure representing information extracted from an in-app receipt.
-public struct InAppReceiptInfo {
-    // Hardcoded values for testing
-    public fileprivate(set) var bundleIdentifier: String? = "com.bjitgroup.easypurchase"
-    public fileprivate(set) var bundleIdentifierData: Data? = Data([0x01, 0x02, 0x03])
-    public fileprivate(set) var bundleVersion: String? = "1.0.0"
-    public fileprivate(set) var originalApplicationVersion: String? = "1.0"
-    public fileprivate(set) var opaqueValue: Data? = Data([0xAA, 0xBB, 0xCC])
-    public fileprivate(set) var sha1: Data? = Data([0xDD, 0xEE, 0xFF])
-    public fileprivate(set) var receiptCreationDate: Date? = Date()
-    public fileprivate(set) var receiptCreationDateString: String?
-    public fileprivate(set) var receiptExpirationDate: Date? = Date().addingTimeInterval(30 * 24 * 60 * 60)  // 30 days later
-    public fileprivate(set) var receiptExpirationDateString: String?
-    // ... (set other ReceiptInfo properties)
-}
-
-// MARK: - InAppReceipt Class
+// MARK: - InAppReceiptValidator Class
 
 /// A class representing an in-app receipt with methods to access its payload properties.
-public class InAppReceipt {
+public class InAppReceiptValidator {
     // ReceiptInfo instance to hold hardcoded values
-    var receiptInfo = InAppReceiptInfo()
+    var receiptInfo : PayloadData
 
     /// A property representing the payload extracted from the in-app receipt.
-    public var payload: InAppReceiptPayload {
-        return InAppReceiptPayload(
+    public var processedFinalPayload: InAppReceiptValidatorPayload {
+        return InAppReceiptValidatorPayload(
             bundleIdentifier: receiptInfo.bundleIdentifier ?? "",
             appVersion: receiptInfo.bundleVersion ?? "",
             originalAppVersion: receiptInfo.originalApplicationVersion ?? "",
             expirationDate: receiptInfo.receiptExpirationDate,
             bundleIdentifierData: receiptInfo.bundleIdentifierData ?? Data(),
             opaqueValue: receiptInfo.opaqueValue ?? Data(),
-            receiptHash: receiptInfo.sha1 ?? Data(),
+            receiptHash: receiptInfo.sha1Hash ?? Data(),
             creationDate: receiptInfo.receiptCreationDate ?? Date(),
             ageRating: "",
             environment: "",
@@ -48,45 +30,47 @@ public class InAppReceipt {
         )
     }
     /// Initializes an InAppReceipt instance with hardcoded ReceiptInfo values.
-    public init() {}
+    public init(_ receiptInfo: PayloadData) {
+        self.receiptInfo = receiptInfo
+    }
 }
 
-// MARK: - InAppReceipt Extension
+// MARK: - InAppReceiptValidator Extension
 
-public extension InAppReceipt {
+public extension InAppReceiptValidator {
     /// The app’s bundle identifier
 
     /// Property representing the app's bundle identifier extracted from the in-app receipt payload.
     var bundleIdentifier: String {
-        return payload.bundleIdentifier
+        return processedFinalPayload.bundleIdentifier
     }
 
     /// The app’s version number
 
     /// Property representing the app's version number extracted from the in-app receipt payload.
     var appVersion: String {
-        return payload.appVersion
+        return processedFinalPayload.appVersion
     }
 
     /// The version of the app that was originally purchased.
 
     /// Property representing the original app version extracted from the in-app receipt payload.
     var originalAppVersion: String {
-        return payload.originalAppVersion
+        return processedFinalPayload.originalAppVersion
     }
 }
 
-// MARK: - InAppReceipt Validation Extension
+// MARK: - IInAppReceiptValidator Extension
 
 /// An extension on InAppReceipt to facilitate receipt validation.
-public extension InAppReceipt {
+public extension InAppReceiptValidator {
 
     /// Determine whether the receipt is valid or not.
     ///
     /// - Returns: `true` if the receipt is valid, otherwise `false`.
-    var isValid: Bool {
+    var isValidReceipt: Bool {
         do {
-            try validate()
+            try validateReceipt()
             return true
         } catch {
             return false
@@ -96,8 +80,8 @@ public extension InAppReceipt {
     /// Validate In-App Receipt.
     ///
     /// - throws: An error in the InAppReceipt domain if verification fails.
-    func validate() throws {
-        try verifyBundleIdentifierAndVersion()
+    func validateReceipt() throws {
+        try checkBundleIdentifierAndVersion()
     }
 
     /// Verify In-App Receipt.
@@ -105,22 +89,21 @@ public extension InAppReceipt {
     /// - throws: An error in the InAppReceipt domain if verification fails.
     @available(*, deprecated, renamed: "validate")
     func verify() throws {
-        try verifyBundleIdentifierAndVersion()
+        try checkBundleIdentifierAndVersion()
     }
 
     /// Verify that the bundle identifier in the receipt matches a hard-coded constant containing the CFBundleIdentifier value you expect in the Info.plist file.
     /// Verify that the version identifier string in the receipt matches a hard-coded constant containing the CFBundleShortVersionString value (for macOS) or the CFBundleVersion value (for iOS) that you expect in the Info.plist file.
     ///
     /// - throws: An error in the InAppReceipt domain if verification fails.
-    func verifyBundleIdentifierAndVersion() throws {
-        try verifyBundleIdentifier()
-        //try verifyBundleVersion()
+    func checkBundleIdentifierAndVersion() throws {
+        try checkBundleIdentifier()
     }
 
     /// Verify that the bundle identifier in the receipt matches a hard-coded constant containing the CFBundleIdentifier value you expect in the Info.plist file.
     ///
     /// - throws: An error in the InAppReceipt domain if verification fails.
-    func verifyBundleIdentifier() throws {
+    func checkBundleIdentifier() throws {
         guard let bundleID = Bundle.main.bundleIdentifier, bundleID == bundleIdentifier else {
             throw ValidationError.validationFailed(reason: .bundleIdentifierVerification)
         }
@@ -129,7 +112,7 @@ public extension InAppReceipt {
     /// Verify that the version identifier string in the receipt matches a hard-coded constant containing the CFBundleShortVersionString value (for macOS) or the CFBundleVersion value (for iOS) that you expect in the Info.plist file.
     ///
     /// - throws: An error in the InAppReceipt domain if verification fails.
-    func verifyBundleVersion() throws {
+    func checkBundleVersion() throws {
         guard let version = Bundle.main.appVersion, version == appVersion else {
             throw ValidationError.validationFailed(reason: .bundleVersionVerification)
         }

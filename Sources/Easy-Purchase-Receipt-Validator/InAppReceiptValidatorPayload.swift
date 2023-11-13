@@ -1,52 +1,48 @@
 //
-//  InAppReceiptPayload.swift
+//  InAppReceiptValidatorPayload.swift
 //  
 //
-//  Created by BJIT on 8/11/23.
+//  Created by BJIT on 9/11/23.
 //
-
 import Foundation
 
 // MARK: - InAppReceiptPayload
 
-struct InAppReceiptPayload {
+public struct InAppReceiptValidatorPayload {
     // MARK: Properties
 
-    /// In-app purchase receipts associated with the payload.
-    let purchases: [InAppPurchaseInfo]
-
     /// The bundle identifier of the app.
-    let bundleIdentifier: String
+    public let bundleIdentifier: String
 
     /// The version number of the app.
-    let appVersion: String
+    public let appVersion: String
 
     /// The version of the app that was originally purchased.
-    let originalAppVersion: String
+    public let originalAppVersion: String
 
     /// The date when the app receipt expires.
-    let expirationDate: Date?
+    public let expirationDate: Date?
 
     /// The bundle identifier data used for validation.
-    let bundleIdentifierData: Data
+    public let bundleIdentifierData: Data
 
     /// An opaque value used, with other data, to compute the SHA-1 hash during validation.
-    let opaqueValue: Data
+    public let opaqueValue: Data
 
     /// A SHA-1 hash used to validate the receipt.
-    let receiptHash: Data
+    public let receiptHash: Data
 
     /// The date when the app receipt was created.
-    let creationDate: Date
+    public let creationDate: Date
 
     /// The age rating of the app.
-    let ageRating: String
+    public let ageRating: String
 
     /// The environment in which the receipt was generated.
-    let environment: String
+    public let environment: String
 
     /// Raw payload data.
-    let rawData: Data
+    public let rawData: Data
 
     // MARK: Initialization
 
@@ -66,11 +62,10 @@ struct InAppReceiptPayload {
     ///   - environment: The environment in which the receipt was generated.
     ///   - rawData: Raw payload data.
     ///
-    init(bundleIdentifier: String, appVersion: String, originalAppVersion: String, purchases: [InAppPurchaseInfo], expirationDate: Date?, bundleIdentifierData: Data, opaqueValue: Data, receiptHash: Data, creationDate: Date, ageRating: String, environment: String, rawData: Data) {
+    init(bundleIdentifier: String, appVersion: String, originalAppVersion: String, expirationDate: Date?, bundleIdentifierData: Data, opaqueValue: Data, receiptHash: Data, creationDate: Date, ageRating: String, environment: String, rawData: Data) {
         self.bundleIdentifier = bundleIdentifier
         self.appVersion = appVersion
         self.originalAppVersion = originalAppVersion
-        self.purchases = purchases
         self.expirationDate = expirationDate
         self.bundleIdentifierData = bundleIdentifierData
         self.opaqueValue = opaqueValue
@@ -79,22 +74,5 @@ struct InAppReceiptPayload {
         self.ageRating = ageRating
         self.environment = environment
         self.rawData = rawData
-    }
-
-    // MARK: Checkers
-
-    func isBundleIdentifierValid() -> Bool {
-        // Add your validation logic here
-        return !bundleIdentifier.isEmpty
-    }
-
-    func isAppVersionValid() -> Bool {
-        // Add your validation logic here
-        return !appVersion.isEmpty
-    }
-
-    func isOriginalAppVersionValid() -> Bool {
-        // Add your validation logic here
-        return !originalAppVersion.isEmpty
     }
 }
