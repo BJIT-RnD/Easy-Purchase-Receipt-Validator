@@ -15,9 +15,8 @@ import Foundation
      - `ContainerError.invalid`: Indicates that the Apple Container is invalid.
      - `ContainerError.parsingIssue`: Indicates an issue with parsing the Apple Container data.
  */
-class AppleContainer {
-    
-    //Primary block containing the PKCS7 structure.
+public class AppleContainer {
+    // Primary block containing the PKCS7 structure.
     public let coreBlock: ASN1Object
 
     /**
@@ -145,4 +144,3 @@ class AppleContainer {
         return !out.isEmpty ? out : nil
     }
 }
-

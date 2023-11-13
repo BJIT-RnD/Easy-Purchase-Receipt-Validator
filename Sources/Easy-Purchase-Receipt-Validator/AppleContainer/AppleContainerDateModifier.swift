@@ -8,7 +8,6 @@
 import Foundation
 /// A utility class for parsing date values encoded as strings in receipts.
 enum ReceiptDateParser {
-
     /// Parses a date from a string encoded in receipt-conform representation.
     ///
     /// - Parameter dateString: A string representing the date.
@@ -26,4 +25,3 @@ enum ReceiptDateParser {
         return dateFormatter
     }()
 }
-
