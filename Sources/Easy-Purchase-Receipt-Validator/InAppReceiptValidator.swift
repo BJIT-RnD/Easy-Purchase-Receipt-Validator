@@ -1,11 +1,13 @@
 //
 //  InAppReceiptValidator.swift
 //
-//
 //  Created by BJIT on 9/11/23.
 //
 
 import Foundation
+import CommonCrypto
+import UIKit
+
 // MARK: - InAppReceiptValidator Class
 
 /// A class representing an in-app receipt with methods to access its payload properties.
@@ -19,14 +21,15 @@ public class InAppReceiptValidator {
             bundleIdentifier: receiptInfo.bundleIdentifier ?? "",
             appVersion: receiptInfo.bundleVersion ?? "",
             originalAppVersion: receiptInfo.originalApplicationVersion ?? "",
-            expirationDate: receiptInfo.receiptExpirationDate,
+            expirationDate: receiptInfo.receiptExpirationDate ?? Date(),
             bundleIdentifierData: receiptInfo.bundleIdentifierData ?? Data(),
             opaqueValue: receiptInfo.opaqueValue ?? Data(),
             receiptHash: receiptInfo.sha1Hash ?? Data(),
             creationDate: receiptInfo.receiptCreationDate ?? Date(),
             ageRating: "",
             environment: "",
-            rawData: Data() // Replace with actual raw data if needed
+            rawData: Data(), // Replace with actual raw data if needed
+            purchases: receiptInfo.inAppPurchasesReceipt ?? []
         )
     }
     /// Initializes an InAppReceipt instance with hardcoded ReceiptInfo values.
@@ -58,6 +61,34 @@ public extension InAppReceiptValidator {
     var originalAppVersion: String {
         return processedFinalPayload.originalAppVersion
     }
+
+    /// Used to validate the receipt
+    var bundleIdentifierData: Data
+    {
+        return processedFinalPayload.bundleIdentifierData
+    }
+
+    /// An opaque value used, with other data, to compute the SHA-1 hash during validation.
+    var opaqueValue: Data
+    {
+        return processedFinalPayload.opaqueValue
+    }
+
+    /// A SHA-1 hash, used to validate the receipt.
+    var receiptHash: Data
+    {
+        return processedFinalPayload.receiptHash
+    }
+
+    /// Creation date of the receipt
+    var creationDate: Date {
+        return processedFinalPayload.creationDate
+    }
+
+    /// Expiration date of the receipt
+    var expirationDate: Date {
+        return processedFinalPayload.expirationDate
+    }
 }
 
 // MARK: - IInAppReceiptValidator Extension
@@ -81,15 +112,9 @@ public extension InAppReceiptValidator {
     ///
     /// - throws: An error in the InAppReceipt domain if verification fails.
     func validateReceipt() throws {
+        try verifyHash()
         try checkBundleIdentifierAndVersion()
-    }
-
-    /// Verify In-App Receipt.
-    ///
-    /// - throws: An error in the InAppReceipt domain if verification fails.
-    @available(*, deprecated, renamed: "validate")
-    func verify() throws {
-        try checkBundleIdentifierAndVersion()
+        try checkAppVersion()
     }
 
     /// Verify that the bundle identifier in the receipt matches a hard-coded constant containing the CFBundleIdentifier value you expect in the Info.plist file.
@@ -112,9 +137,84 @@ public extension InAppReceiptValidator {
     /// Verify that the version identifier string in the receipt matches a hard-coded constant containing the CFBundleShortVersionString value (for macOS) or the CFBundleVersion value (for iOS) that you expect in the Info.plist file.
     ///
     /// - throws: An error in the InAppReceipt domain if verification fails.
-    func checkBundleVersion() throws {
+    func checkAppVersion() throws {
         guard let version = Bundle.main.appVersion, version == appVersion else {
             throw ValidationError.validationFailed(reason: .bundleVersionVerification)
         }
+    }
+
+    /// Checks the validity of the expiration date in comparison to the current date.
+    ///
+    /// This function compares the expiration date extracted from the processed final payload
+    /// with the current date to determine if the receipt is still valid or has expired.
+    ///
+    /// - Returns: `true` if the expiration date is greater than or equal to the current date,
+    /// indicating that the receipt is still valid. Returns `false` if the expiration date is earlier
+    /// than the current date, indicating that the receipt has expired.
+    func checkExpirationDateValid() -> Bool {
+        // Get the current date
+        let currentDate = Date()
+
+        // Retrieve the expiration date from the processed final payload
+        let expirationDate = processedFinalPayload.expirationDate
+
+        // Check if the expiration date is greater than or equal to the current date
+        return expirationDate >= currentDate
+    }
+
+    /// Verify the hash of the computed data against the stored receipt hash.
+    ///
+    /// - throws: An error in the InAppReceipt domain if verification fails.
+    func verifyHash() throws
+    {
+        if (computedHash != receiptHash)
+        {
+            throw ValidationError.validationFailed(reason: .hashValidation)
+        }
+    }
+
+    /// Compute SHA-1 hash for the provided data.
+    ///
+    /// - returns: SHA-1 hash as Data.
+    internal var computedHash: Data {
+        let uuidData = guid()
+        let opaqueData = opaqueValue
+        let bundleIdData = bundleIdentifierData
+
+        var hash = [UInt8](repeating: 0, count: Int(CC_SHA1_DIGEST_LENGTH))
+        var ctx = CC_SHA1_CTX()
+        _ = uuidData.withUnsafeBytes { uuidBytes in
+            CC_SHA1_Init(&ctx)
+            CC_SHA1_Update(&ctx, uuidBytes.baseAddress, CC_LONG(uuidData.count))
+        }
+        _ = opaqueData.withUnsafeBytes { opaqueBytes in
+            CC_SHA1_Update(&ctx, opaqueBytes.baseAddress, CC_LONG(opaqueData.count))
+        }
+        _ = bundleIdData.withUnsafeBytes { bundleIdBytes in
+            CC_SHA1_Update(&ctx, bundleIdBytes.baseAddress, CC_LONG(bundleIdData.count))
+        }
+        CC_SHA1_Final(&hash, &ctx)
+
+        return Data(hash)
+    }
+
+    /// Generate a unique identifier for the current platform.
+    ///
+    /// - returns: A Data object containing the unique identifier.
+    func guid() -> Data {
+        #if os(watchOS)
+        var uuidBytes = WKInterfaceDevice.current().identifierForVendor!.uuid
+        return Data(bytes: &uuidBytes, count: MemoryLayout.size(ofValue: uuidBytes))
+        #elseif !targetEnvironment(macCatalyst) && (os(iOS) || os(tvOS))
+        var uuidBytes = UIDevice.current.identifierForVendor!.uuid
+        return Data(bytes: &uuidBytes, count: MemoryLayout.size(ofValue: uuidBytes))
+        #elseif targetEnvironment(macCatalyst) || os(macOS)
+        if let guid = getMacAddress() {
+            return guid
+        } else {
+            assertionFailure("Failed to retrieve guid")
+            return Data() // This line may need to be modified based on your requirements
+        }
+        #endif
     }
 }

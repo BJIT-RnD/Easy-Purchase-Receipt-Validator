@@ -21,7 +21,7 @@ public struct InAppReceiptValidatorPayload {
     public let originalAppVersion: String
 
     /// The date when the app receipt expires.
-    public let expirationDate: Date?
+    public let expirationDate: Date
 
     /// The bundle identifier data used for validation.
     public let bundleIdentifierData: Data
@@ -44,6 +44,9 @@ public struct InAppReceiptValidatorPayload {
     /// Raw payload data.
     public let rawData: Data
 
+    // Purchases' details
+    public let purchases: [PurchaseData]?
+
     // MARK: Initialization
 
     /// Initializes an `InAppReceiptPayload` with the specified values.
@@ -62,7 +65,7 @@ public struct InAppReceiptValidatorPayload {
     ///   - environment: The environment in which the receipt was generated.
     ///   - rawData: Raw payload data.
     ///
-    init(bundleIdentifier: String, appVersion: String, originalAppVersion: String, expirationDate: Date?, bundleIdentifierData: Data, opaqueValue: Data, receiptHash: Data, creationDate: Date, ageRating: String, environment: String, rawData: Data) {
+    init(bundleIdentifier: String, appVersion: String, originalAppVersion: String, expirationDate: Date, bundleIdentifierData: Data, opaqueValue: Data, receiptHash: Data, creationDate: Date, ageRating: String, environment: String, rawData: Data, purchases: [PurchaseData]) {
         self.bundleIdentifier = bundleIdentifier
         self.appVersion = appVersion
         self.originalAppVersion = originalAppVersion
@@ -74,5 +77,6 @@ public struct InAppReceiptValidatorPayload {
         self.ageRating = ageRating
         self.environment = environment
         self.rawData = rawData
+        self.purchases = purchases
     }
 }
