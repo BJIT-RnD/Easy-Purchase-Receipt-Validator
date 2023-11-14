@@ -17,4 +17,7 @@ final class ReceiptStateViewModel {
         }
         return false
     }
+    func refreshReceipt(){
+        IAPHelper.shared.refreshReceipt()
+    }
 }
