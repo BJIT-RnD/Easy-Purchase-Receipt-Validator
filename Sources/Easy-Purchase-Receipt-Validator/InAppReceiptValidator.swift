@@ -13,28 +13,11 @@ import UIKit
 /// A class representing an in-app receipt with methods to access its payload properties.
 public class InAppReceiptValidator {
     // ReceiptInfo instance to hold hardcoded values
-    var receiptInfo : PayloadData
+    var processedFinalPayload : PayloadData
 
-    /// A property representing the payload extracted from the in-app receipt.
-    public var processedFinalPayload: InAppReceiptValidatorPayload {
-        return InAppReceiptValidatorPayload(
-            bundleIdentifier: receiptInfo.bundleIdentifier ?? "",
-            appVersion: receiptInfo.bundleVersion ?? "",
-            originalAppVersion: receiptInfo.originalApplicationVersion ?? "",
-            expirationDate: receiptInfo.receiptExpirationDate ?? Date(),
-            bundleIdentifierData: receiptInfo.bundleIdentifierData ?? Data(),
-            opaqueValue: receiptInfo.opaqueValue ?? Data(),
-            receiptHash: receiptInfo.sha1Hash ?? Data(),
-            creationDate: receiptInfo.receiptCreationDate ?? Date(),
-            ageRating: "",
-            environment: "",
-            rawData: Data(), // Replace with actual raw data if needed
-            purchases: receiptInfo.inAppPurchasesReceipt ?? []
-        )
-    }
     /// Initializes an InAppReceipt instance with hardcoded ReceiptInfo values.
     public init(_ receiptInfo: PayloadData) {
-        self.receiptInfo = receiptInfo
+        self.processedFinalPayload = receiptInfo
     }
 }
 
@@ -45,49 +28,45 @@ public extension InAppReceiptValidator {
 
     /// Property representing the app's bundle identifier extracted from the in-app receipt payload.
     var bundleIdentifier: String {
-        return processedFinalPayload.bundleIdentifier
+        return processedFinalPayload.bundleIdentifier ?? ""
     }
 
     /// The app’s version number
+    var originalAppVersion: String {
+        return processedFinalPayload.originalApplicationVersion ?? ""
+    }
 
     /// Property representing the app's version number extracted from the in-app receipt payload.
     var appVersion: String {
-        return processedFinalPayload.appVersion
-    }
-
-    /// The version of the app that was originally purchased.
-
-    /// Property representing the original app version extracted from the in-app receipt payload.
-    var originalAppVersion: String {
-        return processedFinalPayload.originalAppVersion
+        return processedFinalPayload.bundleVersion ?? ""
     }
 
     /// Used to validate the receipt
     var bundleIdentifierData: Data
     {
-        return processedFinalPayload.bundleIdentifierData
+        return processedFinalPayload.bundleIdentifierData ?? Data()
     }
 
     /// An opaque value used, with other data, to compute the SHA-1 hash during validation.
     var opaqueValue: Data
     {
-        return processedFinalPayload.opaqueValue
+        return processedFinalPayload.opaqueValue ?? Data()
     }
 
     /// A SHA-1 hash, used to validate the receipt.
     var receiptHash: Data
     {
-        return processedFinalPayload.receiptHash
+        return processedFinalPayload.sha1Hash ?? Data()
     }
 
     /// Creation date of the receipt
     var creationDate: Date {
-        return processedFinalPayload.creationDate
+        return processedFinalPayload.receiptCreationDate ?? Date()
     }
 
     /// Expiration date of the receipt
     var expirationDate: Date {
-        return processedFinalPayload.expirationDate
+        return processedFinalPayload.receiptExpirationDate ?? Date()
     }
 }
 
@@ -156,7 +135,7 @@ public extension InAppReceiptValidator {
         let currentDate = Date()
 
         // Retrieve the expiration date from the processed final payload
-        let expirationDate = processedFinalPayload.expirationDate
+        guard let expirationDate = processedFinalPayload.receiptExpirationDate else { return false }
 
         // Check if the expiration date is greater than or equal to the current date
         return expirationDate >= currentDate
