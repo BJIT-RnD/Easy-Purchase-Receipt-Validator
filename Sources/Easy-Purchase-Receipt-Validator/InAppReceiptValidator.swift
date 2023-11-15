@@ -27,46 +27,56 @@ public extension InAppReceiptValidator {
     /// The app’s bundle identifier
 
     /// Property representing the app's bundle identifier extracted from the in-app receipt payload.
-    var bundleIdentifier: String {
-        return processedFinalPayload.bundleIdentifier ?? ""
+    var bundleIdentifier: String? {
+        return processedFinalPayload.bundleIdentifier
     }
 
     /// The app’s version number
-    var originalAppVersion: String {
-        return processedFinalPayload.originalApplicationVersion ?? ""
+    var originalAppVersion: String? {
+        return processedFinalPayload.originalApplicationVersion
     }
 
     /// Property representing the app's version number extracted from the in-app receipt payload.
-    var appVersion: String {
-        return processedFinalPayload.bundleVersion ?? ""
+    var bundleVersion: String? {
+        return processedFinalPayload.bundleVersion
     }
 
     /// Used to validate the receipt
-    var bundleIdentifierData: Data
+    var bundleIdentifierData: Data?
     {
-        return processedFinalPayload.bundleIdentifierData ?? Data()
+        return processedFinalPayload.bundleIdentifierData //?? Data()
     }
 
     /// An opaque value used, with other data, to compute the SHA-1 hash during validation.
-    var opaqueValue: Data
+    var opaqueValue: Data?
     {
-        return processedFinalPayload.opaqueValue ?? Data()
+        return processedFinalPayload.opaqueValue //?? Data()
     }
 
     /// A SHA-1 hash, used to validate the receipt.
-    var receiptHash: Data
+    var receiptHash: Data?
     {
-        return processedFinalPayload.sha1Hash ?? Data()
+        return processedFinalPayload.sha1Hash
     }
 
     /// Creation date of the receipt
-    var creationDate: Date {
-        return processedFinalPayload.receiptCreationDate ?? Date()
+    var creationDate: Date? {
+        return processedFinalPayload.receiptCreationDate
     }
 
     /// Expiration date of the receipt
-    var expirationDate: Date {
-        return processedFinalPayload.receiptExpirationDate ?? Date()
+    var expirationDate: Date? {
+        return processedFinalPayload.receiptExpirationDate
+    }
+    
+    /// Creation date of the receipt in String
+    var creationDateString: String? {
+        return processedFinalPayload.receiptCreationDateString
+    }
+
+    /// Expiration date of the receipt in String
+    var expirationDateString: String? {
+        return processedFinalPayload.receiptExpirationDateString
     }
 }
 
@@ -117,7 +127,7 @@ public extension InAppReceiptValidator {
     ///
     /// - throws: An error in the InAppReceipt domain if verification fails.
     func checkAppVersion() throws {
-        guard let version = Bundle.main.appVersion, version == appVersion else {
+        guard let version = Bundle.main.appVersion, version == bundleVersion else {
             throw ValidationError.validationFailed(reason: .bundleVersionVerification)
         }
     }
@@ -157,24 +167,24 @@ public extension InAppReceiptValidator {
     /// - returns: SHA-1 hash as Data.
     internal var computedHash: Data {
         let uuidData = guid()
-        let opaqueData = opaqueValue
-        let bundleIdData = bundleIdentifierData
+        if let opaqueData = opaqueValue, let bundleIdData = bundleIdentifierData {
+            var hash = [UInt8](repeating: 0, count: Int(CC_SHA1_DIGEST_LENGTH))
+            var ctx = CC_SHA1_CTX()
+            _ = uuidData.withUnsafeBytes { uuidBytes in
+                CC_SHA1_Init(&ctx)
+                CC_SHA1_Update(&ctx, uuidBytes.baseAddress, CC_LONG(uuidData.count))
+            }
+            _ = opaqueData.withUnsafeBytes { opaqueBytes in
+                CC_SHA1_Update(&ctx, opaqueBytes.baseAddress, CC_LONG(opaqueData.count))
+            }
+            _ = bundleIdData.withUnsafeBytes { bundleIdBytes in
+                CC_SHA1_Update(&ctx, bundleIdBytes.baseAddress, CC_LONG(bundleIdData.count))
+            }
+            CC_SHA1_Final(&hash, &ctx)
 
-        var hash = [UInt8](repeating: 0, count: Int(CC_SHA1_DIGEST_LENGTH))
-        var ctx = CC_SHA1_CTX()
-        _ = uuidData.withUnsafeBytes { uuidBytes in
-            CC_SHA1_Init(&ctx)
-            CC_SHA1_Update(&ctx, uuidBytes.baseAddress, CC_LONG(uuidData.count))
+            return Data(hash)
         }
-        _ = opaqueData.withUnsafeBytes { opaqueBytes in
-            CC_SHA1_Update(&ctx, opaqueBytes.baseAddress, CC_LONG(opaqueData.count))
-        }
-        _ = bundleIdData.withUnsafeBytes { bundleIdBytes in
-            CC_SHA1_Update(&ctx, bundleIdBytes.baseAddress, CC_LONG(bundleIdData.count))
-        }
-        CC_SHA1_Final(&hash, &ctx)
-
-        return Data(hash)
+        return Data()
     }
 
     /// Generate a unique identifier for the current platform.

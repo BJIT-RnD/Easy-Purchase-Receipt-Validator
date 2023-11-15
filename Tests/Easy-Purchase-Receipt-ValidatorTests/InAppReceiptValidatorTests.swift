@@ -56,7 +56,7 @@ class InAppReceiptValidatorTests: XCTestCase {
     /// Test case to validate the extraction of app version from InAppReceipt payload.
     func testAppVersion() {
         // When
-        let appVersion = receiptInfo?.appVersion
+        let appVersion = receiptInfo?.bundleVersion
 
         // Then
         XCTAssertEqual(appVersion, "1", "App version should match the expected value.")
@@ -83,7 +83,7 @@ class InAppReceiptValidatorTests: XCTestCase {
     /// Test case to validate the extraction of invalid app version from InAppReceipt payload.
     func testInvalidAppVersion() {
         // When
-        let appVersion = invalidReceiptInfo?.appVersion
+        let appVersion = invalidReceiptInfo?.bundleVersion
 
         // Then
         XCTAssertNotEqual(appVersion, "1", "App version should match the expected value.")
