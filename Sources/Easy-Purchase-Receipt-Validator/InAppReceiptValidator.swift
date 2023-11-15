@@ -6,16 +6,9 @@
 
 import Foundation
 import CommonCrypto
-// Check for iOS
-#if os(iOS) || os(macOS) || os(tvOS)
+#if canImport(UIKit)
 import UIKit
 #endif
-
-// Check for watchOS
-#if os(watchOS)
-import watchkit
-#endif
-
 
 // MARK: - InAppReceiptValidator Class
 
