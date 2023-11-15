@@ -6,7 +6,9 @@
 
 import Foundation
 import CommonCrypto
+#if canImport(UIKit)
 import UIKit
+#endif
 
 // MARK: - InAppReceiptValidator Class
 
@@ -180,7 +182,7 @@ public extension InAppReceiptValidator {
     /// Generate a unique identifier for the current platform.
     ///
     /// - returns: A Data object containing the unique identifier.
-    func guid() -> Data {
+    internal func guid() -> Data {
         #if os(watchOS)
         var uuidBytes = WKInterfaceDevice.current().identifierForVendor!.uuid
         return Data(bytes: &uuidBytes, count: MemoryLayout.size(ofValue: uuidBytes))
