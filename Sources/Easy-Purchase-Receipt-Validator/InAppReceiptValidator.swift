@@ -199,13 +199,6 @@ public extension InAppReceiptValidator {
         #elseif !targetEnvironment(macCatalyst) && (os(iOS) || os(tvOS))
         var uuidBytes = UIDevice.current.identifierForVendor!.uuid
         return Data(bytes: &uuidBytes, count: MemoryLayout.size(ofValue: uuidBytes))
-        #elseif targetEnvironment(macCatalyst) || os(macOS)
-        if let guid = getMacAddress() {
-            return guid
-        } else {
-            assertionFailure("Failed to retrieve guid")
-            return Data() // This line may need to be modified based on your requirements
-        }
         #endif
     }
 }
