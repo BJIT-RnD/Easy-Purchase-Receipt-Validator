@@ -199,6 +199,8 @@ public extension InAppReceiptValidator {
         #elseif !targetEnvironment(macCatalyst) && (os(iOS) || os(tvOS))
         var uuidBytes = UIDevice.current.identifierForVendor!.uuid
         return Data(bytes: &uuidBytes, count: MemoryLayout.size(ofValue: uuidBytes))
+        #elseif targetEnvironment(macCatalyst) || os(macOS)
+        return Data()
         #endif
     }
 }
