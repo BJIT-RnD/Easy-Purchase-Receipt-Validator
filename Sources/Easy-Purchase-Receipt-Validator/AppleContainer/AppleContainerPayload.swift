@@ -1,9 +1,13 @@
-//
-//  File.swift
-//  
-//
-//  Created by BJIT on 10/11/23.
-//
+/**
+ File Name: `AppleContainer+Extensions.swift`
+
+ Description: This file extends the functionality of the `AppleContainer` class by adding additional enums and methods related to Apple Receipt processing and date parsing.
+
+ ## Enumerations
+
+ 1. `receiptFields`: Enumerates receipt-related fields with associated raw values representing their tag numbers.
+ 2. `purchaseFields`: Enumerates in-app purchase-related fields with associated raw values representing their tag numbers.
+ */
 
 import Foundation
 extension AppleContainer {
@@ -40,7 +44,7 @@ extension AppleContainer {
     ///
     /// - Parameter dateString: The date string to process.
     /// - Returns: A Date object if parsing is successful, otherwise nil.
-    func processDate(_ dateString: String) -> Date? {
+    private func processDate(_ dateString: String) -> Date? {
         return ReceiptDateParser.parseDate(from: dateString)
     }
     
@@ -111,6 +115,13 @@ extension AppleContainer {
         return InAppReceiptValidator(payloadData)
     }
 
+    /// Processes a list of ASN.1 sub-items representing in-app purchase information and extracts relevant details into a `PurchaseData` object.
+    ///
+    /// - Parameter subItems: The list of ASN.1 sub-items containing in-app purchase data.
+    /// - Returns: A populated `PurchaseData` object with extracted in-app purchase information.
+    ///
+    /// Each sub-item in the provided list corresponds to a specific field in the in-app purchase data structure. The function iterates through the sub-items, retrieves field types and values, and updates the corresponding properties in the `PurchaseData` structure.
+    /// - Note: This function is designed to be used within the context of processing Apple Receipt data.
     private func inAppPurchase(_ subItems: [ASN1Object]) -> PurchaseData {
         // Initialize the PurchaseData structure to hold in-app purchase information.
         var inAppPurchaseData = PurchaseData()

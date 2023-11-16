@@ -1,9 +1,10 @@
-//
-//  File.swift
-//  
-//
-//  Created by BJIT on 10/11/23.
-//
+/**
+ File Name: `PayloadData.swift`
+
+ Description: This file defines the `PayloadData` struct, which represents data extracted from an Apple Receipt. It includes information such as bundle identifier, version, opaque value, SHA-1 hash, creation date, expiration date, and in-app purchase details.
+ 
+ - Note: This struct is designed to hold information extracted from an Apple Receipt during processing.
+ */
 
 import Foundation
 public struct PayloadData {
@@ -37,17 +38,4 @@ public struct PayloadData {
     /// A string representation of the receipt expiration date, which may be useful for human-readable presentation.
     public var receiptExpirationDateString: String?
     public var inAppPurchasesReceipt: [PurchaseData]?
-}
-
-public struct PurchaseData {
-    public var quantities: UInt64?
-    public var productIdentifier: String?
-    public var transactionId: String?
-    public var originalTransactionId: String?
-    public var purchaseDate: Date?
-    public var originalPurchaseDate: Date?
-    public var expiresDate: Date?
-    public var isInIntroOfferPeriod: UInt64?
-    public var cancellationDate: Date?
-    public var webOrderLineItemId: UInt64?
 }

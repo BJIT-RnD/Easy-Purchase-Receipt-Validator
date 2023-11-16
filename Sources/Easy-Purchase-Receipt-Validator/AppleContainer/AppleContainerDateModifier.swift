@@ -1,9 +1,9 @@
-//
-//  File.swift
-//  
-//
-//  Created by BJIT on 9/11/23.
-//
+/**
+ File Name: AppleContainerDateModifier
+ Enum: `ReceiptDateParser`
+
+ Description: The `ReceiptDateParser` enum provides date parsing functionality for strings encoded in receipt-conform representation. It offers a static method, `parseDate(from:)`, to parse a date from a string and a private static property, `defaultDateFormatter`, which encapsulates the date formatter configuration for parsing receipt-conform date strings.
+*/
 
 import Foundation
 /// A utility class for parsing date values encoded as strings in receipts.

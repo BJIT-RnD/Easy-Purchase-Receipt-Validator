@@ -33,7 +33,6 @@ class InAppReceiptValidatorTests: XCTestCase {
         }
         let appleContainerInvalid = try? AppleContainer(data: dataInvalid)
         invalidReceiptInfo = appleContainerInvalid?.AppleReceipt()
-
     }
 
     override func tearDown() {

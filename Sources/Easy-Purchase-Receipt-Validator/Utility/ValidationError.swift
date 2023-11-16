@@ -6,8 +6,7 @@
 //
 
 import Foundation
-public enum ValidationError: Error
-{
+public enum ValidationError: Error {
     case initializationFailed(reason: ReceiptInitializationFailureReason)
     case validationFailed(reason: ValidationFailureReason)
     case purchaseExpired
@@ -16,8 +15,7 @@ public enum ValidationError: Error
     ///
     /// - appStoreReceiptNotFound:         In-App Receipt not found
     /// - pkcs7ParsingError:               PKCS7 Container can't be extracted from in-app receipt data
-    public enum ReceiptInitializationFailureReason
-    {
+    public enum ReceiptInitializationFailureReason {
         case appStoreReceiptNotFound
         case pkcs7ParsingError
         case dataIsInvalid
@@ -27,8 +25,7 @@ public enum ValidationError: Error
     ///
     /// - hashValidation:          Computed hash doesn't match the hash from the receipt's payload
     /// - signatureValidation:     Error occurs during signature validation. It has several reasons to failure
-    public enum ValidationFailureReason
-    {
+    public enum ValidationFailureReason {
         case hashValidation
         case signatureValidation(SignatureValidationFailureReason)
         case bundleIdentifierVerification
@@ -42,8 +39,7 @@ public enum ValidationError: Error
     /// - receiptIsNotSigned:                       The receipt doesn't contain a signature
     /// - receiptSignedDataNotFound:                The receipt does contain somr signature, but there is an error while creating a signature object
     /// - invalidSignature:                         The receipt contains invalid signature
-    public enum SignatureValidationFailureReason
-    {
+    public enum SignatureValidationFailureReason {
         case appleIncRootCertificateNotFound
         case unableToLoadAppleIncRootCertificate
         case unableToLoadAppleIncPublicKey
