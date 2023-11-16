@@ -1,7 +1,8 @@
 //
 //  InAppReceiptValidator.swift
-//
-//  Created by BJIT on 9/11/23.
+///
+/// Description: A class representing an in-app receipt with methods to access its payload properties.
+///  Created by BJIT on 9/11/23.
 //
 
 import Foundation
@@ -12,7 +13,6 @@ import UIKit
 
 // MARK: - InAppReceiptValidator Class
 
-/// A class representing an in-app receipt with methods to access its payload properties.
 public class InAppReceiptValidator {
     // ReceiptInfo instance to hold hardcoded values
     private var processedFinalPayload : PayloadData
