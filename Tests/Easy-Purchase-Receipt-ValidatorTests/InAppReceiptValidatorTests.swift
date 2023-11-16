@@ -39,13 +39,12 @@ class InAppReceiptValidatorTests: XCTestCase {
     override func tearDown() {
         super.tearDown()
         // Tear down the test environment
-
         // Release the object to free up resources
         receiptInfo = nil
     }
 
     /// Test case to validate the extraction of bundle identifier from InAppReceipt payload.
-    func testBundleIdentifier() {
+    func test_InAppReceiptValidator_whenOriginalReceiptGiven_bundleIdentifierShouldEqual() {
         // When
         let bundleIdentifier = receiptInfo?.bundleIdentifier
 
@@ -54,16 +53,16 @@ class InAppReceiptValidatorTests: XCTestCase {
     }
 
     /// Test case to validate the extraction of app version from InAppReceipt payload.
-    func testAppVersion() {
+    func test_InAppReceiptValidator_whenOriginalReceiptGiven_bundleVersionShouldEqual() {
         // When
-        let appVersion = receiptInfo?.bundleVersion
+        let bundleVersion = receiptInfo?.bundleVersion
 
         // Then
-        XCTAssertEqual(appVersion, "1", "App version should match the expected value.")
+        XCTAssertEqual(bundleVersion, "1", "App version should match the expected value.")
     }
 
     /// Test case to validate the extraction of original app version from InAppReceipt payload.
-    func testOriginalAppVersion() {
+    func test_InAppReceiptValidator_whenOriginalReceiptGiven_originalAppVersionShouldEqual() {
         // When
         let originalAppVersion = receiptInfo?.originalAppVersion
 
@@ -72,7 +71,7 @@ class InAppReceiptValidatorTests: XCTestCase {
     }
 
     /// Test case to validate the extraction of invalid bundle identifier from InAppReceipt payload.
-    func testInvalidBundleIdentifier() {
+    func test_InAppReceiptValidator_whenInvalidReceiptGiven_bundleIdentifierShouldNotEqual() {
         // When
         let bundleIdentifier = invalidReceiptInfo?.bundleIdentifier
 
@@ -81,16 +80,16 @@ class InAppReceiptValidatorTests: XCTestCase {
     }
 
     /// Test case to validate the extraction of invalid app version from InAppReceipt payload.
-    func testInvalidAppVersion() {
+    func test_InAppReceiptValidator_whenInvalidReceiptGiven_bundleVersionShouldNotEqual() {
         // When
-        let appVersion = invalidReceiptInfo?.bundleVersion
+        let bundleVersion = invalidReceiptInfo?.bundleVersion
 
         // Then
-        XCTAssertNotEqual(appVersion, "1", "App version should match the expected value.")
+        XCTAssertNotEqual(bundleVersion, "1", "App version should match the expected value.")
     }
 
     /// Test case to validate the extraction of invalid original app version from InAppReceipt payload.
-    func testInvalidOriginalAppVersion() {
+    func test_InAppReceiptValidator_whenInvalidReceiptGiven_originalAppVersionShouldNotEqual() {
         // When
         let originalAppVersion = invalidReceiptInfo?.originalAppVersion
 
@@ -102,17 +101,17 @@ class InAppReceiptValidatorTests: XCTestCase {
 extension InAppReceiptValidatorTests {
         // MARK: - Validation Tests
 
-        func testIsValidReceipt() {
+        func test_InAppReceiptValidator_whenOriginalReceiptGiven_isValidReceiptNotNilShouldReturnTrue() {
             // Assuming your validation logic is correct, this test checks if isValidReceipt works as expected
             XCTAssertTrue(((receiptInfo?.isValidReceipt) != nil))
         }
 
-        func testInvalidReceipt() {
+        func test_InAppReceiptValidator_whenInvalidReceiptGiven_isValidReceiptNilShouldReturnTrue() {
             // Assuming your validation logic is correct, this test checks if isValidReceipt works as expected
             XCTAssertTrue(((invalidReceiptInfo?.isValidReceipt) == nil))
         }
 
-        func testCheckExpirationDateValid() {
+        func test_InAppReceiptValidator_whenOriginalReceiptGiven_checkExpirationDateValidNotNilShouldReturnTrue() {
            // Assuming the expiration date is set to tomorrow, this test checks if checkExpirationDateValid returns true
             XCTAssertTrue(((receiptInfo?.checkExpirationDateValid()) != nil))
         }
