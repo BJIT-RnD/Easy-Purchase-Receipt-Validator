@@ -14,7 +14,7 @@ extension Bundle {
     /// - Note: This method uses the appropriate key (`CFBundleShortVersionString` for macOS and Mac Catalyst, `CFBundleVersion` for other platforms)
     ///
     /// - Returns: The app version string, or `nil` if unable to retrieve.
-    var appVersion: String? {
+    var bundleVersion: String? {
         #if targetEnvironment(macCatalyst) || os(macOS)
         let versionKey: String = "CFBundleShortVersionString"
         #else

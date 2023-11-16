@@ -15,7 +15,7 @@ import UIKit
 /// A class representing an in-app receipt with methods to access its payload properties.
 public class InAppReceiptValidator {
     // ReceiptInfo instance to hold hardcoded values
-    var processedFinalPayload : PayloadData
+    private var processedFinalPayload : PayloadData
 
     /// Initializes an InAppReceipt instance with hardcoded ReceiptInfo values.
     public init(_ receiptInfo: PayloadData) {
@@ -44,20 +44,17 @@ public extension InAppReceiptValidator {
     }
 
     /// Used to validate the receipt
-    var bundleIdentifierData: Data?
-    {
+    var bundleIdentifierData: Data? {
         return processedFinalPayload.bundleIdentifierData //?? Data()
     }
 
     /// An opaque value used, with other data, to compute the SHA-1 hash during validation.
-    var opaqueValue: Data?
-    {
+    private var opaqueValue: Data? {
         return processedFinalPayload.opaqueValue //?? Data()
     }
 
     /// A SHA-1 hash, used to validate the receipt.
-    var receiptHash: Data?
-    {
+    private var receiptHash: Data? {
         return processedFinalPayload.sha1Hash
     }
 
@@ -72,12 +69,12 @@ public extension InAppReceiptValidator {
     }
     
     /// Creation date of the receipt in String
-    var creationDateString: String? {
+    private var creationDateString: String? {
         return processedFinalPayload.receiptCreationDateString
     }
 
     /// Expiration date of the receipt in String
-    var expirationDateString: String? {
+    private var expirationDateString: String? {
         return processedFinalPayload.receiptExpirationDateString
     }
 }
@@ -102,10 +99,9 @@ public extension InAppReceiptValidator {
     /// Validate In-App Receipt.
     ///
     /// - throws: An error in the InAppReceipt domain if verification fails.
-    func validateReceipt() throws {
+    private func validateReceipt() throws {
         try verifyHash()
         try checkBundleIdentifierAndVersion()
-        try checkAppVersion()
     }
 
     /// Verify that the bundle identifier in the receipt matches a hard-coded constant containing the CFBundleIdentifier value you expect in the Info.plist file.
@@ -114,12 +110,13 @@ public extension InAppReceiptValidator {
     /// - throws: An error in the InAppReceipt domain if verification fails.
     func checkBundleIdentifierAndVersion() throws {
         try checkBundleIdentifier()
+        try checkBundleVersion()
     }
 
     /// Verify that the bundle identifier in the receipt matches a hard-coded constant containing the CFBundleIdentifier value you expect in the Info.plist file.
     ///
     /// - throws: An error in the InAppReceipt domain if verification fails.
-    func checkBundleIdentifier() throws {
+    private func checkBundleIdentifier() throws {
         guard let bundleID = Bundle.main.bundleIdentifier, bundleID == bundleIdentifier else {
             throw ValidationError.validationFailed(reason: .bundleIdentifierVerification)
         }
@@ -128,8 +125,8 @@ public extension InAppReceiptValidator {
     /// Verify that the version identifier string in the receipt matches a hard-coded constant containing the CFBundleShortVersionString value (for macOS) or the CFBundleVersion value (for iOS) that you expect in the Info.plist file.
     ///
     /// - throws: An error in the InAppReceipt domain if verification fails.
-    func checkAppVersion() throws {
-        guard let version = Bundle.main.appVersion, version == bundleVersion else {
+    func checkBundleVersion() throws {
+        guard let version = Bundle.main.bundleVersion, version == bundleVersion else {
             throw ValidationError.validationFailed(reason: .bundleVersionVerification)
         }
     }
@@ -143,23 +140,18 @@ public extension InAppReceiptValidator {
     /// indicating that the receipt is still valid. Returns `false` if the expiration date is earlier
     /// than the current date, indicating that the receipt has expired.
     func checkExpirationDateValid() -> Bool {
-        // Get the current date
         let currentDate = Date()
 
-        // Retrieve the expiration date from the processed final payload
         guard let expirationDate = processedFinalPayload.receiptExpirationDate else { return false }
 
-        // Check if the expiration date is greater than or equal to the current date
         return expirationDate >= currentDate
     }
 
     /// Verify the hash of the computed data against the stored receipt hash.
     ///
     /// - throws: An error in the InAppReceipt domain if verification fails.
-    func verifyHash() throws
-    {
-        if (computedHash != receiptHash)
-        {
+    private func verifyHash() throws {
+        if (computedHash != receiptHash) {
             throw ValidationError.validationFailed(reason: .hashValidation)
         }
     }
