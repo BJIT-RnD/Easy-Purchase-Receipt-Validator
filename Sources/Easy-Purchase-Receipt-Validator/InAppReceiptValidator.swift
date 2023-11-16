@@ -167,7 +167,7 @@ public extension InAppReceiptValidator {
     /// Compute SHA-1 hash for the provided data.
     ///
     /// - returns: SHA-1 hash as Data.
-    internal var computedHash: Data {
+    private var computedHash: Data {
         let uuidData = guid()
         if let opaqueData = opaqueValue, let bundleIdData = bundleIdentifierData {
             var hash = [UInt8](repeating: 0, count: Int(CC_SHA1_DIGEST_LENGTH))
@@ -192,7 +192,7 @@ public extension InAppReceiptValidator {
     /// Generate a unique identifier for the current platform.
     ///
     /// - returns: A Data object containing the unique identifier.
-    internal func guid() -> Data {
+    private func guid() -> Data {
         #if os(watchOS)
         var uuidBytes = WKInterfaceDevice.current().identifierForVendor!.uuid
         return Data(bytes: &uuidBytes, count: MemoryLayout.size(ofValue: uuidBytes))
