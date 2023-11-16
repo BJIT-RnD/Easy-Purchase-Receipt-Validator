@@ -49,12 +49,12 @@ public extension InAppReceiptValidator {
     }
 
     /// An opaque value used, with other data, to compute the SHA-1 hash during validation.
-    private var opaqueValue: Data? {
+    var opaqueValue: Data? {
         return processedFinalPayload.opaqueValue //?? Data()
     }
 
     /// A SHA-1 hash, used to validate the receipt.
-    private var receiptHash: Data? {
+    var receiptHash: Data? {
         return processedFinalPayload.sha1Hash
     }
 
@@ -69,12 +69,12 @@ public extension InAppReceiptValidator {
     }
     
     /// Creation date of the receipt in String
-    private var creationDateString: String? {
+    var creationDateString: String? {
         return processedFinalPayload.receiptCreationDateString
     }
 
     /// Expiration date of the receipt in String
-    private var expirationDateString: String? {
+    var expirationDateString: String? {
         return processedFinalPayload.receiptExpirationDateString
     }
 }
