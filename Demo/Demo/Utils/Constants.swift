@@ -11,6 +11,7 @@ import StoreKit
 enum Constants {
     static let purchasableProducts = ["", ""]
     static var availableProductsCollection: [String: SKProduct] = [:]
+    static let receiptDataKey = "receiptDataKey"
 }
 
 enum ProductType {

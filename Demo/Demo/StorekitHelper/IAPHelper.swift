@@ -46,6 +46,11 @@ final class IAPHelper: NSObject {
         SKPaymentQueue.default().add(self)
         SKPaymentQueue.default().restoreCompletedTransactions()
     }
+    func refreshReceipt(){
+        let request = SKReceiptRefreshRequest()
+        request.delegate = self
+        request.start()
+    }
 }
 
 // MARK: - SKProductsRequestDelegate, SKRequestDelegate
@@ -62,6 +67,11 @@ extension IAPHelper: SKProductsRequestDelegate, SKRequestDelegate {
     func request(_ request: SKRequest, didFailWithError error: Error) {
         print(error.localizedDescription)
         FetchProductsListVC.viewModel.fetchedProducts = []
+    }
+    func requestDidFinish(_ request: SKRequest) {
+        if request is SKReceiptRefreshRequest {
+            ReceiptStateVC.viewModel.isReceiptAvailable.value = true
+        }
     }
 }
 
