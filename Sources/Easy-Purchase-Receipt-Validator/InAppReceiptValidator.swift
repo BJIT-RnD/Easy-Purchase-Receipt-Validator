@@ -11,9 +11,28 @@ import CommonCrypto
 import UIKit
 #endif
 
+// MARK: - InAppReceiptValidatorProtocol
+/// Protocol defining the contract for in-app receipt validation.
+///
+/// Conforming classes should implement methods and properties to access and validate in-app receipt information.
+protocol InAppReceiptValidatorProtocol {
+    var bundleIdentifier: String? { get }
+    var originalAppVersion: String? { get }
+    var bundleVersion: String? { get }
+    var bundleIdentifierData: Data? { get }
+    var opaqueValue: Data? { get }
+    var receiptHash: Data? { get }
+    var creationDate: Date? { get }
+    var expirationDate: Date? { get }
+    var creationDateString: String? { get }
+    var expirationDateString: String? { get }
+    var isValidReceipt: Bool { get }
+    func checkExpirationDateValid() -> Bool
+}
+
 // MARK: - InAppReceiptValidator Class
 
-public class InAppReceiptValidator {
+public class InAppReceiptValidator: InAppReceiptValidatorProtocol {
     // ReceiptInfo instance to hold hardcoded values
     private var processedFinalPayload : PayloadData
 
@@ -108,7 +127,7 @@ public extension InAppReceiptValidator {
     /// Verify that the version identifier string in the receipt matches a hard-coded constant containing the CFBundleShortVersionString value (for macOS) or the CFBundleVersion value (for iOS) that you expect in the Info.plist file.
     ///
     /// - throws: An error in the InAppReceipt domain if verification fails.
-    func checkBundleIdentifierAndVersion() throws {
+    private func checkBundleIdentifierAndVersion() throws {
         try checkBundleIdentifier()
         try checkBundleVersion()
     }
@@ -125,7 +144,7 @@ public extension InAppReceiptValidator {
     /// Verify that the version identifier string in the receipt matches a hard-coded constant containing the CFBundleShortVersionString value (for macOS) or the CFBundleVersion value (for iOS) that you expect in the Info.plist file.
     ///
     /// - throws: An error in the InAppReceipt domain if verification fails.
-    func checkBundleVersion() throws {
+    private func checkBundleVersion() throws {
         guard let version = Bundle.main.bundleVersion, version == bundleVersion else {
             throw ValidationError.validationFailed(reason: .bundleVersionVerification)
         }
