@@ -44,7 +44,11 @@ final class RestoreVC: UIViewController {
 
     @IBAction func restoreClicked(_ sender: Any) {
         loader.startAnimating()
-        RestoreVC.viewModel.restoreCompletedTransactions()
+        if(NetworkManager.shared.isConnectedToNetwork()) {
+            RestoreVC.viewModel.restoreCompletedTransactions()
+        } else {
+            print("Network error at \(self) please fix the network")
+        }
     }
 }
 

@@ -17,7 +17,11 @@ final class FetchProductsListVC: UIViewController {
         super.viewDidLoad()
         initialSetup()
         setupBinders()
-        FetchProductsListVC.viewModel.getPurchasableProducts()
+        if(NetworkManager.shared.isConnectedToNetwork()) {
+            FetchProductsListVC.viewModel.getPurchasableProducts()
+        } else {
+            print("Network error at \(self) please fix the network")
+        }
     }
     private func setupBinders() {
         FetchProductsListVC.viewModel.fetchList.bind { [weak self] fetchedList in
