@@ -1,10 +1,10 @@
 //
-//  File.swift
-//  
+//  File: SupportExtentions.swift
 //
-//  Created by BJIT on 13/11/23.
+//  Description: This file contains extensions for the Data type providing additional functionality.
+//  It includes a method to convert Data to a hexadecimal-encoded string and another method to convert a base64-encoded string to Data.
+//  Created by BJIT on 10/11/23.
 //
-
 import Foundation
 extension Data {
     /// Converts Data to a hexadecimal-encoded string.
