@@ -58,36 +58,3 @@ final class AppleContainerTest: XCTestCase {
         XCTAssertEqual(receipt.opaqueValue!.hexEncodedString(), "F32757D0012E48CE7E2DDE97E8F27FBD", "Incorrect opaque value")
     }
 }
-    
-    // MARK: will be added when product function will be developed in Inteface class
-//    func test_productCount_whenTwoPurchasedProduct_shouldReturnTwo() {
-//        guard let data = Data(base64Encoded: easyPurchaseSandboxReceipt) else {
-//            XCTFail("Invalid Base64 format")
-//            return
-//        }
-//        // Act
-//        let appleContainer = try? AppleContainer(data: data)
-//        guard let receipt = appleContainer?.AppleReceipt() else {
-//            XCTFail("Invalid Receipt format")
-//            return
-//        }
-//        // Assert
-//        XCTAssertEqual(receipt.inAppPurchasesReceipt?.count, 2, "Incorrect number of purchased products")
-//    }
-//
-//    func test_firstProductInfo_whenValidReceiptGiven_shouldReturnValidInfo() {
-//        guard let data = Data(base64Encoded: easyPurchaseSandboxReceipt) else {
-//            XCTFail("Invalid Base64 format")
-//            return
-//        }
-//        // Act
-//        let appleContainer = try? AppleContainer(data: data)
-//        guard let receipt = appleContainer?.AppleReceipt() else {
-//            XCTFail("Invalid Receipt format")
-//            return
-//        }
-//        // Assert
-//        XCTAssertEqual(receipt.inAppPurchasesReceipt?.first?.productIdentifier, "com.bjitgroup.easypurchase.consumable.tencoin", "Incorrect product identifier")
-//        XCTAssertEqual(receipt.inAppPurchasesReceipt?.first?.quantities, 1, "Incorrect quantity")
-//        XCTAssertEqual(receipt.inAppPurchasesReceipt?.first?.transactionId, "2000000456998762", "Incorrect transaction ID")
-//    }
