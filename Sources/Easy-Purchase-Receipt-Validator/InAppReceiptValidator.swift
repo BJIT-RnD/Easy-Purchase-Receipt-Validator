@@ -27,6 +27,7 @@ protocol InAppReceiptValidatorProtocol {
     var creationDateString: String? { get }
     var expirationDateString: String? { get }
     var isValidReceipt: Bool { get }
+    var purchases: [PurchaseData]? { get }
     func checkExpirationDateValid() -> Bool
 }
 
@@ -95,6 +96,19 @@ public extension InAppReceiptValidator {
     /// Expiration date of the receipt in String
     var expirationDateString: String? {
         return processedFinalPayload.receiptExpirationDateString
+    }
+
+    /// In-app purchase's receipts
+    var purchases: [PurchaseData]? {
+        return processedFinalPayload.inAppPurchasesReceipt
+    }
+
+    /// Returns `true` if any purchases exist, `false` otherwise
+    var hasPurchases: Bool? {
+        guard let purchases = purchases else {
+            return nil 
+        }
+        return purchases.count > 0
     }
 }
 
