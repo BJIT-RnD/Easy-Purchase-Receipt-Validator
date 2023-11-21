@@ -7,6 +7,7 @@
 
 import Foundation
 import CommonCrypto
+import Security
 #if canImport(UIKit)
 import UIKit
 #endif
@@ -31,7 +32,6 @@ protocol InAppReceiptValidatorProtocol {
 }
 
 // MARK: - InAppReceiptValidator Class
-
 public class InAppReceiptValidator: InAppReceiptValidatorProtocol {
     // ReceiptInfo instance to hold hardcoded values
     private var processedFinalPayload : PayloadData
@@ -213,5 +213,70 @@ public extension InAppReceiptValidator {
         #elseif targetEnvironment(macCatalyst) || os(macOS)
         return Data()
         #endif
+    }
+}
+
+
+//MARK: AppleRootCertificate public key parser.
+extension InAppReceiptValidator {
+    private func getPublicKey() throws -> String? {
+        let certificateData = try getCertificate()
+        if let certificate = SecCertificateCreateWithData(nil, certificateData as CFData) {
+            if #available(iOS 12.0, *) {
+                if let publicKey = SecCertificateCopyKey(certificate) {
+                    return try ConvertPublicKeyAsBase64EncodedString(from: publicKey)
+                } else {
+                    throw ValidationError.validationFailed(reason: .signatureValidation(.unableToLoadAppleIncPublicSecKey))
+                }
+            } else {
+                if let publicKey = extractPublicKey(from: certificate) {
+                    return try ConvertPublicKeyAsBase64EncodedString(from: publicKey)
+                } else {
+                    throw ValidationError.validationFailed(reason: .signatureValidation(.unableToLoadAppleIncPublicSecKey))
+                }
+            }
+        } else {
+            throw ValidationError.validationFailed(reason: .signatureValidation(.unableToLoadAppleIncRootCertificate))
+        }
+    }
+    
+    private func getCertificate() throws -> Data {
+        guard let certificateURL = Bundle.main.url(forResource: "AppleIncRootCertificate", withExtension: "cer") else {
+            throw ValidationError.validationFailed(reason: .signatureValidation(.appleIncRootCertificateNotFound))
+        }
+        guard let certificateData = try? Data(contentsOf: certificateURL) else {
+            throw ValidationError.validationFailed(reason: .signatureValidation(.unableToLoadAppleIncRootCertificate))
+        }
+        return certificateData
+    }
+    
+    private func ConvertPublicKeyAsBase64EncodedString(from publicKey: SecKey) throws -> String? {
+        var error: Unmanaged<CFError>?
+        if let publicKeyData = SecKeyCopyExternalRepresentation(publicKey, &error) as Data? {
+            let publicKeyString = publicKeyData.base64EncodedString()
+            print("Public Key: \(publicKeyString)")
+            return publicKeyString
+        } else {
+            throw ValidationError.validationFailed(reason: .signatureValidation(.unableToLoadAppleIncPublicKey))
+        }
+    }
+    
+    private func extractPublicKey(from certificate: SecCertificate) -> SecKey? {
+        var publicKey: SecKey?
+        let policy = SecPolicyCreateBasicX509()
+        if let trust = createTrustWithCertificate(certificate, policy: policy),
+           let trustPublicKey = SecTrustCopyPublicKey(trust) {
+            publicKey = trustPublicKey
+        }
+        return publicKey
+    }
+    
+    private func createTrustWithCertificate(_ certificate: SecCertificate, policy: SecPolicy) -> SecTrust? {
+        var trust: SecTrust?
+        let certificates = [certificate] as CFArray
+        if SecTrustCreateWithCertificates(certificates, policy, &trust) == errSecSuccess {
+            return trust
+        }
+        return nil
     }
 }
