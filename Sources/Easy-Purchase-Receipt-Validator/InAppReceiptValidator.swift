@@ -229,3 +229,107 @@ public extension InAppReceiptValidator {
         #endif
     }
 }
+
+// MARK: - InAppReceiptValidator Extension
+
+extension InAppReceiptValidator {
+
+    // MARK: Original Transaction Identifier
+
+    /// Returns the original transaction identifier for the first purchase of a specific product identifier.
+    ///
+    /// - Parameter productIdentifier: The product identifier.
+    /// - Returns: The original transaction identifier, or `nil` if no purchases exist.
+
+    // MARK: Contains Purchase
+
+    /// Checks if there is a purchase for a specific product identifier.
+    ///
+    /// - Parameter productIdentifier: The product identifier.
+    /// - Returns: `true` if the product has been purchased, `false` otherwise.
+
+    // MARK: Purchase Expired Date
+
+    /// Returns the expiration date of the first purchase for a specific product identifier.
+    ///
+    /// - Parameter productIdentifier: The product identifier.
+    /// - Returns: The expiration date, or `nil` if no purchases exist or the expiration date is `nil`.
+
+    // MARK: Purchases
+
+    /// Returns an array of purchases for a specific product identifier.
+    ///
+    /// - Parameters:
+    ///   - productIdentifier: The product identifier.
+    ///   - sort: An optional sorting block for the purchases.
+    /// - Returns: An array of purchases, sorted if a sorting block is provided.
+
+    // MARK: Currently Active Auto-Renewable Subscription Purchases
+
+    /// Returns the currently active auto-renewable subscription purchase for a specific product identifier and date.
+    ///
+    /// - Parameters:
+    ///   - productIdentifier: The product identifier.
+    ///   - date: The date for which the subscription's status is checked.
+    /// - Returns: The active auto-renewable subscription purchase, or `nil` if none is found.
+    ///
+    func originalTransactionIdentifier(ofProductIdentifier productIdentifier: String) -> String? {
+        return allPurchasesByProductId(ofProductIdentifier: productIdentifier).first?.originalTransactionId
+    }
+
+    public func containsPurchase(ofProductIdentifier productIdentifier: String) -> Bool {
+        guard let unwrappedPurchases = purchases else {
+            return false
+        }
+
+        for item in unwrappedPurchases {
+            if item.productIdentifier == productIdentifier {
+                return true
+            }
+        }
+
+        return false
+    }
+
+    public func checkPurchaseExpiredDatebyProductId(ofProductIdentifier productIdentifier: String) -> Date? {
+        guard let purchased = allPurchasesByProductId(ofProductIdentifier: productIdentifier).first,
+              let expirationDate = purchased.expiresDate else {
+            return nil
+        }
+
+        return expirationDate
+    }
+
+    func allPurchasesByProductId(ofProductIdentifier productIdentifier: String,
+                   sortedBy sort: ((PurchaseData, PurchaseData) -> Bool)? = nil) -> [PurchaseData] {
+        guard let unwrappedPurchases = purchases else {
+            return []
+        }
+
+        let filtered: [PurchaseData] = unwrappedPurchases.filter {
+            $0.productIdentifier == productIdentifier
+        }
+
+        if let sort = sort {
+            return filtered.sorted(by: sort)
+        } else {
+            return filtered.sorted(by: {
+                guard let date1 = $0.purchaseDate, let date2 = $1.purchaseDate else {
+                    return true
+                }
+                return date1 > date2
+            })
+        }
+    }
+
+    public func currentlyActiveAutoRenewableSubscriptionPurchases(ofProductIdentifier productIdentifier: String, forDate date: Date) -> PurchaseData? {
+        let filteredbyProductId = allPurchasesByProductId(ofProductIdentifier: productIdentifier)
+
+        for purchase in filteredbyProductId {
+            if purchase.checkActiveAutoRenewableSubscriptionByProductId(forDate: date) {
+                return purchase
+            }
+        }
+        return nil
+    }
+}
