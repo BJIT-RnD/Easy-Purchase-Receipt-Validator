@@ -43,4 +43,16 @@ final class ReceiptStateVC: UIViewController {
         loader.startAnimating()
         ReceiptStateVC.viewModel.refreshReceipt()
     }
+
+    @IBAction func didTapAvailabilityButton(_ sender: Any) {
+        if self.availabilityLabel.text == "Available" {
+            let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
+            let nextViewController = (storyBoard.instantiateViewController(withIdentifier: "ReceiptDataDetailViewController") as? ReceiptDataDetailViewController)
+            nextViewController?.modalPresentationStyle = .overFullScreen
+            self.present(nextViewController ?? UIViewController(), animated:true, completion:nil)
+
+        }
+    }
+    
+
 }

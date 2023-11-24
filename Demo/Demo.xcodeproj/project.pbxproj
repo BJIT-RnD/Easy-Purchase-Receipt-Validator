@@ -31,6 +31,7 @@
 		893778AA2ADFA80E00DEF484 /* ReceiptStateVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 893778A92ADFA80E00DEF484 /* ReceiptStateVC.swift */; };
 		893778AC2ADFA82B00DEF484 /* ReceiptStateViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 893778AB2ADFA82B00DEF484 /* ReceiptStateViewModel.swift */; };
 		89EA55F42B04BE93009B15E6 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89EA55F32B04BE93009B15E6 /* NetworkManager.swift */; };
+		89EA55F72B0F6BBE009B15E6 /* ReceiptDataDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89EA55F62B0F6BBE009B15E6 /* ReceiptDataDetailViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -78,6 +79,7 @@
 		893778A92ADFA80E00DEF484 /* ReceiptStateVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptStateVC.swift; sourceTree = "<group>"; };
 		893778AB2ADFA82B00DEF484 /* ReceiptStateViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptStateViewModel.swift; sourceTree = "<group>"; };
 		89EA55F32B04BE93009B15E6 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
+		89EA55F62B0F6BBE009B15E6 /* ReceiptDataDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptDataDetailViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -140,6 +142,7 @@
 				893778A32ADE5B7500DEF484 /* RestoreView */,
 				893778A82ADFA7E200DEF484 /* ReceiptView */,
 				893778902ADE3B4100DEF484 /* Utils */,
+				89EA55F52B0F6B6D009B15E6 /* ReceiptDataDetails */,
 				893778952ADE3C2E00DEF484 /* StorekitHelper */,
 				84C477592ADCF578003A20F7 /* LaunchScreen.storyboard */,
 				84C4775C2ADCF578003A20F7 /* Info.plist */,
@@ -226,6 +229,14 @@
 				893778AB2ADFA82B00DEF484 /* ReceiptStateViewModel.swift */,
 			);
 			path = ReceiptView;
+			sourceTree = "<group>";
+		};
+		89EA55F52B0F6B6D009B15E6 /* ReceiptDataDetails */ = {
+			isa = PBXGroup;
+			children = (
+				89EA55F62B0F6BBE009B15E6 /* ReceiptDataDetailViewController.swift */,
+			);
+			path = ReceiptDataDetails;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -412,6 +423,7 @@
 				893778882ADE2E1200DEF484 /* ProductCell.swift in Sources */,
 				84C477512ADCF577003A20F7 /* SceneDelegate.swift in Sources */,
 				893778942ADE3BF100DEF484 /* ObservableObject.swift in Sources */,
+				89EA55F72B0F6BBE009B15E6 /* ReceiptDataDetailViewController.swift in Sources */,
 				893778972ADE3C5200DEF484 /* Message.swift in Sources */,
 				893778852ADE2D4400DEF484 /* FetchProductsListVC.swift in Sources */,
 				8937789B2ADE3DD000DEF484 /* IAPHelper.swift in Sources */,
