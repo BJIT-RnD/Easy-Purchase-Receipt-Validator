@@ -111,6 +111,7 @@ extension AppleContainer {
             }
         }
         let interface = InAppReceiptValidator(payloadData)
+        try interface.isValidReceipt()
         // Return the Interface object containing the extracted information.
         return interface
     }
