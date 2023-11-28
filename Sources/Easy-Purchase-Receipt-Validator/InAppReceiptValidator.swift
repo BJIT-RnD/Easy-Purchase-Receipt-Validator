@@ -331,4 +331,5 @@ extension InAppReceiptValidator {
     //3. computed variables = if the receipt contains any purchases
     //4. function -> if the product contains any introductury offer
     //5. function -> lastAutoRenewableSubscriptionPurchase
+    //6. funtions -> If nonRenewStillExist
 }
