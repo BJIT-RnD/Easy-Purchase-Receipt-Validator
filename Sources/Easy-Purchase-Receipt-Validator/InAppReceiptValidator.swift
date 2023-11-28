@@ -26,7 +26,6 @@ protocol InAppReceiptValidatorProtocol {
     var expirationDate: Date? { get }
     var creationDateString: String? { get }
     var expirationDateString: String? { get }
-    var isValidReceipt: Bool { get }
     var purchases: [PurchaseData]? { get }
     func checkExpirationDateValid() -> Bool
 }
@@ -120,13 +119,8 @@ public extension InAppReceiptValidator {
     /// Determine whether the receipt is valid or not.
     ///
     /// - Returns: `true` if the receipt is valid, otherwise `false`.
-    var isValidReceipt: Bool {
-        do {
-            try validateReceipt()
-            return true
-        } catch {
-            return false
-        }
+    func isValidReceipt() throws {
+        try validateReceipt()
     }
 
     /// Validate In-App Receipt.
@@ -332,4 +326,9 @@ extension InAppReceiptValidator {
         }
         return nil
     }
+    //1. computed variable = activeAutoRenewPurchase
+    //2. computed variable = auto renewPurchase (active + no active)
+    //3. computed variables = if the receipt contains any purchases
+    //4. function -> if the product contains any introductury offer
+    //5. function -> lastAutoRenewableSubscriptionPurchase
 }
