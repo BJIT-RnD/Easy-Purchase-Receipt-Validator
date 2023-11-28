@@ -8,6 +8,8 @@ public enum ReceiptError: Error {
     case fileNotFound
     case invalidData
     case invalidURL
+    case verificationFailed
+    case invalidReceiptBlock
     /// Dectects Error
     /// - Parameter url: receipt loading url
     ///

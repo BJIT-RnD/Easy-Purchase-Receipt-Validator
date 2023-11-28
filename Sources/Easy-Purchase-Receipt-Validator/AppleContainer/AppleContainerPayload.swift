@@ -53,10 +53,10 @@ extension AppleContainer {
     /// Processes the Apple Receipt and extracts relevant information into a PayloadData object.
     ///
     /// - Returns: A PayloadData object containing information from the Apple Receipt, or nil if the processing fails.
-    public func AppleReceipt() -> InAppReceiptValidator? {
+    public func AppleReceipt() throws -> InAppReceiptValidator {
         // Find the relevant block within the coreBlock structure that contains the Apple Receipt data.
         guard let receiptBlock = coreBlock.findASN1Object(of: .pkcs7data)?.parent?.childs?.last?.childASN1Object(at: 0)?.childASN1Object(at: 0) else {
-            return nil
+            throw ReceiptError.invalidReceiptBlock
         }
         
         // Create an empty PayloadData object to store the extracted information.
@@ -110,9 +110,9 @@ extension AppleContainer {
                 break
             }
         }
-        
-        // Return the PayloadData object containing the extracted information.
-        return InAppReceiptValidator(payloadData)
+        let interface = InAppReceiptValidator(payloadData)
+        // Return the Interface object containing the extracted information.
+        return interface
     }
 
     /// Processes a list of ASN.1 sub-items representing in-app purchase information and extracts relevant details into a `PurchaseData` object.
