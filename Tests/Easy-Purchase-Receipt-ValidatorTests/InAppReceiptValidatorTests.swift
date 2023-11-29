@@ -135,7 +135,6 @@ extension InAppReceiptValidatorTests {
 
 // MARK: Extension
 extension InAppReceiptValidatorTests {
-
     func test_OriginalTransactionIdentifier_whenOriginalReceiptGiven_ProductIdWithTransactionIdGiven_originalTransactionIdentifierShouldEqual() {
         let productIdentifier = "com.bjitgroup.easypurchase.autorenewweekly"
         XCTAssertEqual(receiptInfo?.originalTransactionIdentifier(ofProductIdentifier: productIdentifier), "2000000448590922")

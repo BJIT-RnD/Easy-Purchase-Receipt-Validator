@@ -60,8 +60,7 @@ public extension PurchaseData {
         return expiresDate != nil
     }
     
-    func isActiveAutoRenewable(forDate date: Date = Date()) -> Bool{
-        
+    func isActiveAutoRenewable(forDate date: Date = Date()) -> Bool {
         if cancellationDate != nil {
             return false
         }
