@@ -34,7 +34,7 @@ protocol InAppReceiptValidatorProtocol {
 
 public class InAppReceiptValidator: InAppReceiptValidatorProtocol {
     // ReceiptInfo instance to hold hardcoded values
-    private var processedFinalPayload : PayloadData
+    private var processedFinalPayload: PayloadData
 
     /// Initializes an InAppReceipt instance with hardcoded ReceiptInfo values.
     public init(_ receiptInfo: PayloadData) {
@@ -64,12 +64,12 @@ public extension InAppReceiptValidator {
 
     /// Used to validate the receipt
     var bundleIdentifierData: Data? {
-        return processedFinalPayload.bundleIdentifierData //?? Data()
+        return processedFinalPayload.bundleIdentifierData // ?? Data()
     }
 
     /// An opaque value used, with other data, to compute the SHA-1 hash during validation.
     var opaqueValue: Data? {
-        return processedFinalPayload.opaqueValue //?? Data()
+        return processedFinalPayload.opaqueValue // ?? Data()
     }
 
     /// A SHA-1 hash, used to validate the receipt.
@@ -107,7 +107,7 @@ public extension InAppReceiptValidator {
         guard let purchases = purchases else {
             return nil 
         }
-        return purchases.count > 0
+        return !purchases.isEmpty
     }
 }
 
@@ -115,7 +115,6 @@ public extension InAppReceiptValidator {
 
 /// An extension on InAppReceipt to facilitate receipt validation.
 public extension InAppReceiptValidator {
-
     /// Determine whether the receipt is valid or not.
     ///
     /// - Returns: `true` if the receipt is valid, otherwise `false`.
@@ -178,7 +177,7 @@ public extension InAppReceiptValidator {
     ///
     /// - throws: An error in the InAppReceipt domain if verification fails.
     private func verifyHash() throws {
-        if (computedHash != receiptHash) {
+        if computedHash != receiptHash {
             throw ValidationError.validationFailed(reason: .hashValidation)
         }
     }
@@ -227,7 +226,6 @@ public extension InAppReceiptValidator {
 // MARK: - InAppReceiptValidator Extension
 
 extension InAppReceiptValidator {
-
     // MARK: Original Transaction Identifier
 
     /// Returns the original transaction identifier for the first purchase of a specific product identifier.
@@ -326,8 +324,7 @@ extension InAppReceiptValidator {
         }
         return nil
     }
-    public var allAutoRenewables: [PurchaseData]
-    {
+    public var allAutoRenewables: [PurchaseData] {
         var activeAutoRenews: [PurchaseData] = []
         guard let purchases = purchases else {
             return activeAutoRenews
@@ -340,8 +337,7 @@ extension InAppReceiptValidator {
         return activeAutoRenews
     }
     
-    public var activeAutoRenewables: [PurchaseData]
-    {
+    public var activeAutoRenewables: [PurchaseData] {
         var activeAutoRenews: [PurchaseData] = []
         guard let purchases = purchases else {
             return activeAutoRenews
@@ -354,10 +350,10 @@ extension InAppReceiptValidator {
         return activeAutoRenews
     }
 
-    //1. computed variable = activeAutoRenewPurchase
-    //2. computed variable = auto renewPurchase (active + no active)
-    //3. computed variables = if the receipt contains any purchases
-    //4. function -> if the product contains any introductury offer
-    //5. function -> lastAutoRenewableSubscriptionPurchase
-    //6. funtions -> If nonRenewStillExist
+    // 1. computed variable = activeAutoRenewPurchase
+    // 2. computed variable = auto renewPurchase (active + no active)
+    // 3. computed variables = if the receipt contains any purchases
+    // 4. function -> if the product contains any introductury offer
+    // 5. function -> lastAutoRenewableSubscriptionPurchase
+    // 6. funtions -> If nonRenewStillExist
 }
