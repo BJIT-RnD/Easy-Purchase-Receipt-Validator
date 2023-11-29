@@ -326,6 +326,34 @@ extension InAppReceiptValidator {
         }
         return nil
     }
+    public var allAutoRenewables: [PurchaseData]
+    {
+        var activeAutoRenews: [PurchaseData] = []
+        guard let purchases = purchases else {
+            return activeAutoRenews
+        }
+        for purchase in purchases {
+            if purchase.isAutoRenewProduct {
+                activeAutoRenews.append(purchase)
+            }
+        }
+        return activeAutoRenews
+    }
+    
+    public var activeAutoRenewables: [PurchaseData]
+    {
+        var activeAutoRenews: [PurchaseData] = []
+        guard let purchases = purchases else {
+            return activeAutoRenews
+        }
+        for purchase in purchases {
+            if purchase.isAutoRenewProduct && purchase.isActiveAutoRenewable() {
+                activeAutoRenews.append(purchase)
+            }
+        }
+        return activeAutoRenews
+    }
+
     //1. computed variable = activeAutoRenewPurchase
     //2. computed variable = auto renewPurchase (active + no active)
     //3. computed variables = if the receipt contains any purchases
