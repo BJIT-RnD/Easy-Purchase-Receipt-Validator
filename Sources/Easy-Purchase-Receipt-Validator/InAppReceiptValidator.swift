@@ -15,7 +15,7 @@ import UIKit
 /// Protocol defining the contract for in-app receipt validation.
 ///
 /// Conforming classes should implement methods and properties to access and validate in-app receipt information.
-protocol InAppReceiptValidatorProtocol {
+public protocol InAppReceiptValidatorProtocol {
     var bundleIdentifier: String? { get }
     var originalAppVersion: String? { get }
     var bundleVersion: String? { get }
@@ -28,6 +28,16 @@ protocol InAppReceiptValidatorProtocol {
     var expirationDateString: String? { get }
     var purchases: [PurchaseData]? { get }
     func checkExpirationDateValid() -> Bool
+    func originalTransactionIdentifier(ofProductIdentifier productIdentifier: String) -> String?
+    func containsPurchase(ofProductIdentifier productIdentifier: String) -> Bool
+    func checkPurchaseExpiredDatebyProductId(ofProductIdentifier productIdentifier: String) -> Date?
+    func allPurchasesByProductId(ofProductIdentifier productIdentifier: String,
+                   sortedBy sort: ((PurchaseData, PurchaseData) -> Bool)?) -> [PurchaseData]
+    func currentlyActiveAutoRenewableSubscriptionPurchasesByDate(ofProductIdentifier productIdentifier: String, forDate date: Date) -> PurchaseData?
+    func currentlyActiveAutoRenewableSubscriptionPurchases(ofProductIdentifier productIdentifier: String) -> PurchaseData?
+    var allAutoRenewables: [PurchaseData] { get }
+    var activeAutoRenewables: [PurchaseData] { get }
+    func isValidReceipt() throws
 }
 
 // MARK: - InAppReceiptValidator Class
@@ -232,7 +242,7 @@ extension InAppReceiptValidator {
     ///
     /// - Parameter productIdentifier: The product identifier.
     /// - Returns: The original transaction identifier, or `nil` if no purchases exist.
-    func originalTransactionIdentifier(ofProductIdentifier productIdentifier: String) -> String? {
+    public func originalTransactionIdentifier(ofProductIdentifier productIdentifier: String) -> String? {
         return allPurchasesByProductId(ofProductIdentifier: productIdentifier).first?.originalTransactionId
     }
 
@@ -279,7 +289,7 @@ extension InAppReceiptValidator {
     ///   - productIdentifier: The product identifier.
     ///   - sort: An optional sorting block for the purchases.
     /// - Returns: An array of purchases, sorted if a sorting block is provided.
-    func allPurchasesByProductId(ofProductIdentifier productIdentifier: String,
+    public func allPurchasesByProductId(ofProductIdentifier productIdentifier: String,
                    sortedBy sort: ((PurchaseData, PurchaseData) -> Bool)? = nil) -> [PurchaseData] {
         guard let unwrappedPurchases = purchases else {
             return []
@@ -301,7 +311,7 @@ extension InAppReceiptValidator {
         }
     }
 
-    // MARK: Currently Active Auto-Renewable Subscription Purchases
+    // MARK: Currently Active Auto-Renewable Subscription Purchases Within a Specific Date
 
     /// Returns the currently active auto-renewable subscription purchase for a specific product identifier and date.
     ///
@@ -310,9 +320,28 @@ extension InAppReceiptValidator {
     ///   - date: The date for which the subscription's status is checked.
     /// - Returns: The active auto-renewable subscription purchase, or `nil` if none is found.
     ///
-    public func currentlyActiveAutoRenewableSubscriptionPurchases(ofProductIdentifier productIdentifier: String, forDate date: Date) -> PurchaseData? {
+    public func currentlyActiveAutoRenewableSubscriptionPurchasesByDate(ofProductIdentifier productIdentifier: String, forDate date: Date) -> PurchaseData? {
         let filteredbyProductId = allPurchasesByProductId(ofProductIdentifier: productIdentifier)
 
+        for purchase in filteredbyProductId {
+            if purchase.checkActiveAutoRenewableSubscriptionByProductId(forDate: date) {
+                return purchase
+            }
+        }
+        return nil
+    }
+
+    // MARK: Currently Active Auto-Renewable Subscription Purchases
+
+    /// Returns the currently active auto-renewable subscription purchase for a specific product identifier.
+    ///
+    /// - Parameters:
+    ///   - productIdentifier: The product identifier.
+    /// - Returns: The active auto-renewable subscription purchase by checking current date using Date(), or `nil` if none is found.
+    ///
+    public func currentlyActiveAutoRenewableSubscriptionPurchases(ofProductIdentifier productIdentifier: String) -> PurchaseData? {
+        let filteredbyProductId = allPurchasesByProductId(ofProductIdentifier: productIdentifier)
+        let date = Date()
         for purchase in filteredbyProductId {
             if purchase.checkActiveAutoRenewableSubscriptionByProductId(forDate: date) {
                 return purchase
