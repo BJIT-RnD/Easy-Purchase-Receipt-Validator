@@ -41,13 +41,15 @@ public class ASN1Decoder {
         var result: [ASN1Object] = []
         while let nextASN1ObjectPointer = iterator.next() {
             var asn1Object = ASN1Object()
+            var totalASN1ObjInUInt8Form = [UInt8]()
+            totalASN1ObjInUInt8Form.append(nextASN1ObjectPointer)
             asn1Object.identifier = ASN1Identifier(rawValue: nextASN1ObjectPointer)
             
             guard let isConstructed = asn1Object.identifier?.isConstructed() else {
                 return result
             }
             if isConstructed {
-                let contentData = try loadChildContent(iterator: &iterator)
+                let contentData = try loadChildContent(iterator: &iterator, totalASN1ObjInUInt8Form: &totalASN1ObjInUInt8Form)
                 if contentData.isEmpty {
                     asn1Object.childs = try parse(iterator: &iterator)
                 } else {
@@ -56,16 +58,17 @@ public class ASN1Decoder {
                 }
                 asn1Object.value = nil
                 asn1Object.rawValue = Data(contentData)
+                asn1Object.asn1Container = totalASN1ObjInUInt8Form
                 asn1Object.childs?.forEach({ $0.parent = asn1Object })
             } else {
                 if asn1Object.identifier?.typeClass() == .universal {
                     do {
-                        try self.handleUniversalClassTypeIdentifire(asn1obj: &asn1Object, atIteratio: &iterator)
+                        try self.handleUniversalClassTypeIdentifire(asn1obj: &asn1Object, atIteratio: &iterator, totalASN1ObjInUInt8Form: &totalASN1ObjInUInt8Form)
                     } catch _ as ASN1Status {
                         return result
                     }
                 } else {
-                    try self.handleOthersClassTypeIdentifire(asn1obj: &asn1Object, atIteratio: &iterator)
+                    try self.handleOthersClassTypeIdentifire(asn1obj: &asn1Object, atIteratio: &iterator, totalASN1ObjInUInt8Form: &totalASN1ObjInUInt8Form)
                 }
             }
             result.append(asn1Object)
@@ -79,9 +82,10 @@ public class ASN1Decoder {
         - asn1obj: Send an `ASN1Object`. It's `rawValue` & `value` property need to be set.
         - iterator: Give the pointer of the data
      */
-    private func handleUniversalClassTypeIdentifire(asn1obj: inout ASN1Object, atIteratio iterator: inout Data.Iterator) throws {
-        var contentData = try loadChildContent(iterator: &iterator)
+    private func handleUniversalClassTypeIdentifire(asn1obj: inout ASN1Object, atIteratio iterator: inout Data.Iterator, totalASN1ObjInUInt8Form: inout [UInt8]) throws {
+        var contentData = try loadChildContent(iterator: &iterator, totalASN1ObjInUInt8Form: &totalASN1ObjInUInt8Form)
         asn1obj.rawValue = Data(contentData)
+        asn1obj.asn1Container = totalASN1ObjInUInt8Form
         switch asn1obj.identifier?.tagNumber() {
         case .endOfContent:
             throw ASN1Status.endOfContent
@@ -157,9 +161,10 @@ public class ASN1Decoder {
         - asn1obj: Send an `ASN1Object`. It's `rawValue` & `value` property need to be set.
         - iterator: Give the pointer of the data
      */
-    private func handleOthersClassTypeIdentifire(asn1obj: inout ASN1Object, atIteratio iterator: inout Data.Iterator) throws {
-        let contentData = try loadChildContent(iterator: &iterator)
+    private func handleOthersClassTypeIdentifire(asn1obj: inout ASN1Object, atIteratio iterator: inout Data.Iterator, totalASN1ObjInUInt8Form: inout [UInt8]) throws {
+        let contentData = try loadChildContent(iterator: &iterator, totalASN1ObjInUInt8Form: &totalASN1ObjInUInt8Form)
         asn1obj.rawValue = Data(contentData)
+        asn1obj.asn1Container = totalASN1ObjInUInt8Form
         asn1obj.value = String(data: contentData, encoding: .utf8) != nil ? String(data: contentData, encoding: .utf8) : contentData
     }
 }
@@ -252,17 +257,19 @@ extension ASN1Decoder {
      
      So, in the code `let octetsToRead = first! - 0x80`, the subtraction of `0x80` is a way to extract the count of additional bytes used in the `long` form to represent the `length`. This value (`octetsToRead`) is then used to read the actual bytes representing the `length` from the iterator.
      */
-    func getContentLength(iterator: inout Data.Iterator) throws -> UInt64 {
+    func getContentLength(iterator: inout Data.Iterator, totalASN1ObjInUInt8Form: inout [UInt8]) throws -> UInt64 {
         let firstByte = iterator.next()
         guard let firstByte = firstByte else {
             return 0
         }
+        totalASN1ObjInUInt8Form.append(firstByte)
         if firstByte & 0x80 != 0 {
             let octetsToRead = firstByte - 0x80
             var data = Data()
             for _ in 0..<octetsToRead {
                 if let singleData = iterator.next() {
                     data.append(singleData)
+                    totalASN1ObjInUInt8Form.append(singleData)
                 } else {
                     throw ASN1Error.lengthEncodingError
                 }
@@ -279,8 +286,8 @@ extension ASN1Decoder {
         - iterator: Give a start pointer from the asn1 length
      - Returns: Child content as `Data`
      */
-    func loadChildContent(iterator: inout Data.Iterator) throws -> Data {
-        let len = try self.getContentLength(iterator: &iterator)
+    func loadChildContent(iterator: inout Data.Iterator, totalASN1ObjInUInt8Form: inout [UInt8]) throws -> Data {
+        let len = try self.getContentLength(iterator: &iterator, totalASN1ObjInUInt8Form: &totalASN1ObjInUInt8Form)
         guard len < Int.max else {
             return Data()
         }
@@ -292,6 +299,7 @@ extension ASN1Decoder {
                 throw ASN1Error.outOfBuffer
             }
         }
+        totalASN1ObjInUInt8Form.append(contentsOf: byteArray)
         return Data(byteArray)
     }
 }
@@ -299,11 +307,11 @@ extension ASN1Decoder {
 
 // MARK: Extension for unit test
 extension ASN1Decoder {
-    func test_handleOthersClassTypeIdentifire(asn1obj: inout ASN1Object, atIteratio iterator: inout Data.Iterator) throws {
-        try handleOthersClassTypeIdentifire(asn1obj: &asn1obj, atIteratio: &iterator)
+    func test_handleOthersClassTypeIdentifire(asn1obj: inout ASN1Object, atIteratio iterator: inout Data.Iterator, totalASN1ObjInUInt8Form: inout [UInt8]) throws {
+        try handleOthersClassTypeIdentifire(asn1obj: &asn1obj, atIteratio: &iterator, totalASN1ObjInUInt8Form: &totalASN1ObjInUInt8Form)
     }
     
-    func test_handleUniversalClassTypeIdentifire(asn1obj: inout ASN1Object, iterator: inout Data.Iterator) throws {
-        try handleUniversalClassTypeIdentifire(asn1obj: &asn1obj, atIteratio: &iterator)
+    func test_handleUniversalClassTypeIdentifire(asn1obj: inout ASN1Object, iterator: inout Data.Iterator, totalASN1ObjInUInt8Form: inout [UInt8]) throws {
+        try handleUniversalClassTypeIdentifire(asn1obj: &asn1obj, atIteratio: &iterator, totalASN1ObjInUInt8Form: &totalASN1ObjInUInt8Form)
     }
 }
