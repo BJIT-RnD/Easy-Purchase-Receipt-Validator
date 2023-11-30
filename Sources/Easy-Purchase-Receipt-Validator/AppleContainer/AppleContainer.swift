@@ -9,7 +9,7 @@ protocol AppleContainerProtocol {
     var coreBlock: ASN1Object { get }
     var algorithm: String? { get }
     var detectAlgorithmName: String? { get }
-    func AppleReceipt() -> InAppReceiptValidator?
+    func AppleReceipt() throws -> InAppReceiptValidator?
 }
 /**
  The `AppleContainer` class is responsible for handling Apple Container data. It extracts information from the ASN.1 structure in the Apple Container.
@@ -99,5 +99,21 @@ extension AppleContainer {
         } else {
             throw AppleContainerErrors.signatureNotAvailable
         }
+    }
+}
+
+// MARK: Certificate
+extension AppleContainer {
+    func getAllCertificate() -> [CertificateParser] {
+        let certificates = coreBlock.childASN1Object(at: 3)?.childs?.compactMap ({ asn1Object in
+            try? CertificateParser(asn1: asn1Object)
+        }) ?? []
+        return certificates
+    }
+    /**
+     Return `CertificateParser` object which is responsable to parse the 1st certificate from 3 existing certificate
+     */
+    func getOnlySignatureValidationCertificate() -> CertificateParser? {
+        return coreBlock.childASN1Object(at: 3)?.childs?.first.map { try? CertificateParser(asn1: $0) } ?? nil
     }
 }
