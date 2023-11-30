@@ -232,6 +232,9 @@ extension InAppReceiptValidator {
     ///
     /// - Parameter productIdentifier: The product identifier.
     /// - Returns: The original transaction identifier, or `nil` if no purchases exist.
+    func originalTransactionIdentifier(ofProductIdentifier productIdentifier: String) -> String? {
+        return allPurchasesByProductId(ofProductIdentifier: productIdentifier).first?.originalTransactionId
+    }
 
     // MARK: Contains Purchase
 
@@ -239,36 +242,6 @@ extension InAppReceiptValidator {
     ///
     /// - Parameter productIdentifier: The product identifier.
     /// - Returns: `true` if the product has been purchased, `false` otherwise.
-
-    // MARK: Purchase Expired Date
-
-    /// Returns the expiration date of the first purchase for a specific product identifier.
-    ///
-    /// - Parameter productIdentifier: The product identifier.
-    /// - Returns: The expiration date, or `nil` if no purchases exist or the expiration date is `nil`.
-
-    // MARK: Purchases
-
-    /// Returns an array of purchases for a specific product identifier.
-    ///
-    /// - Parameters:
-    ///   - productIdentifier: The product identifier.
-    ///   - sort: An optional sorting block for the purchases.
-    /// - Returns: An array of purchases, sorted if a sorting block is provided.
-
-    // MARK: Currently Active Auto-Renewable Subscription Purchases
-
-    /// Returns the currently active auto-renewable subscription purchase for a specific product identifier and date.
-    ///
-    /// - Parameters:
-    ///   - productIdentifier: The product identifier.
-    ///   - date: The date for which the subscription's status is checked.
-    /// - Returns: The active auto-renewable subscription purchase, or `nil` if none is found.
-    ///
-    func originalTransactionIdentifier(ofProductIdentifier productIdentifier: String) -> String? {
-        return allPurchasesByProductId(ofProductIdentifier: productIdentifier).first?.originalTransactionId
-    }
-
     public func containsPurchase(ofProductIdentifier productIdentifier: String) -> Bool {
         guard let unwrappedPurchases = purchases else {
             return false
@@ -283,6 +256,12 @@ extension InAppReceiptValidator {
         return false
     }
 
+    // MARK: Purchase Expired Date
+
+    /// Returns the expiration date of the first purchase for a specific product identifier.
+    ///
+    /// - Parameter productIdentifier: The product identifier.
+    /// - Returns: The expiration date, or `nil` if no purchases exist or the expiration date is `nil`.
     public func checkPurchaseExpiredDatebyProductId(ofProductIdentifier productIdentifier: String) -> Date? {
         guard let purchased = allPurchasesByProductId(ofProductIdentifier: productIdentifier).first,
               let expirationDate = purchased.expiresDate else {
@@ -292,6 +271,14 @@ extension InAppReceiptValidator {
         return expirationDate
     }
 
+    // MARK: Purchases
+
+    /// Returns an array of purchases for a specific product identifier.
+    ///
+    /// - Parameters:
+    ///   - productIdentifier: The product identifier.
+    ///   - sort: An optional sorting block for the purchases.
+    /// - Returns: An array of purchases, sorted if a sorting block is provided.
     func allPurchasesByProductId(ofProductIdentifier productIdentifier: String,
                    sortedBy sort: ((PurchaseData, PurchaseData) -> Bool)? = nil) -> [PurchaseData] {
         guard let unwrappedPurchases = purchases else {
@@ -314,6 +301,15 @@ extension InAppReceiptValidator {
         }
     }
 
+    // MARK: Currently Active Auto-Renewable Subscription Purchases
+
+    /// Returns the currently active auto-renewable subscription purchase for a specific product identifier and date.
+    ///
+    /// - Parameters:
+    ///   - productIdentifier: The product identifier.
+    ///   - date: The date for which the subscription's status is checked.
+    /// - Returns: The active auto-renewable subscription purchase, or `nil` if none is found.
+    ///
     public func currentlyActiveAutoRenewableSubscriptionPurchases(ofProductIdentifier productIdentifier: String, forDate date: Date) -> PurchaseData? {
         let filteredbyProductId = allPurchasesByProductId(ofProductIdentifier: productIdentifier)
 
@@ -324,6 +320,13 @@ extension InAppReceiptValidator {
         }
         return nil
     }
+    
+    // MARK: All Auto-renewable products receipt containing
+
+    /// Returns all the auto-renewable subscription purchase ever done by the user.
+    ///
+    /// - Returns: The list of all the auto-renewable subscription purchase ever done by the user.
+    ///
     public var allAutoRenewables: [PurchaseData] {
         var activeAutoRenews: [PurchaseData] = []
         guard let purchases = purchases else {
@@ -337,6 +340,12 @@ extension InAppReceiptValidator {
         return activeAutoRenews
     }
     
+    // MARK: All Active Auto-renewable products receipt containing
+
+    /// Returns all the active auto-renewable subscription purchases.
+    ///
+    /// - Returns: The list of all the active auto-renewable subscription purchase ever done by the user.
+    ///
     public var activeAutoRenewables: [PurchaseData] {
         var activeAutoRenews: [PurchaseData] = []
         guard let purchases = purchases else {
@@ -349,11 +358,4 @@ extension InAppReceiptValidator {
         }
         return activeAutoRenews
     }
-
-    // 1. computed variable = activeAutoRenewPurchase
-    // 2. computed variable = auto renewPurchase (active + no active)
-    // 3. computed variables = if the receipt contains any purchases
-    // 4. function -> if the product contains any introductury offer
-    // 5. function -> lastAutoRenewableSubscriptionPurchase
-    // 6. funtions -> If nonRenewStillExist
 }
