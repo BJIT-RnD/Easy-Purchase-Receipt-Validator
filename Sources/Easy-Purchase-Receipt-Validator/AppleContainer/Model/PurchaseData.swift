@@ -56,10 +56,15 @@ public extension PurchaseData {
         // Check if the date is within the valid range of the subscription.
         return date >= purchasedDate && date < expirationDate
     }
+    
+    /// Checks whether the product is auto-renewable type
+    /// - Returns: `true` if the product is auto-renewable, else false
     var isAutoRenewProduct: Bool {
         return expiresDate != nil
     }
     
+    /// Checks whether the  auto-renewable product is currently active
+    /// - Returns: `true` if the  auto-renewable product is active
     func isActiveAutoRenewable(forDate date: Date = Date()) -> Bool {
         if cancellationDate != nil {
             return false
