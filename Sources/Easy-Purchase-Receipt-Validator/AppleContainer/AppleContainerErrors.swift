@@ -15,4 +15,5 @@ enum AppleContainerErrors: Error {
     case invalid
     case parsingIssue
     case signatureNotAvailable
+    case certificatePublicKeyNotAvailable
 }
