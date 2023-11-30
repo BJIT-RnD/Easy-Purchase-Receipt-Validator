@@ -14,9 +14,11 @@ import XCTest
 
 final class ASN1IDecoderTest: XCTestCase {
     var sut: ASN1Decoder!
+    var totalASN1ObjInUInt8Form = [UInt8]()
     override func setUp() {
         super.setUp()
         self.sut = ASN1Decoder()
+        self.totalASN1ObjInUInt8Form = [UInt8]()
     }
     override func tearDown() {
         self.sut = nil
@@ -25,12 +27,14 @@ final class ASN1IDecoderTest: XCTestCase {
     // MARK: GetContentLength
     func test_getContentLength_GivenCorrectLengthByte_ExpectNotThrowingAnyError() {
         var iterator = initialSetup(with: [0x08, 0x02, 0x01, 0x42, 0x04, 0x03, 0x61, 0x62, 0x63])
-        XCTAssertNoThrow(try sut.getContentLength(iterator: &iterator), "Expect not throw any error but it throw and error")
+         
+        XCTAssertNoThrow(try sut.getContentLength(iterator: &iterator, totalASN1ObjInUInt8Form: &totalASN1ObjInUInt8Form), "Expect not throw any error but it throw and error")
     }
     func test_getContentLength_GivenLengthAs8_Expect_8() {
         var iterator = initialSetup(with: [0x08, 0x02, 0x01, 0x42, 0x04, 0x03, 0x61, 0x62, 0x63])
+         
         do {
-            let asn1Length = try sut.getContentLength(iterator: &iterator)
+            let asn1Length = try sut.getContentLength(iterator: &iterator, totalASN1ObjInUInt8Form: &totalASN1ObjInUInt8Form)
             XCTAssertEqual(Int(asn1Length), 8, "Expected 8 but get \(Int(asn1Length))")
         } catch {
             XCTFail("An error occure \(error)")
@@ -38,15 +42,17 @@ final class ASN1IDecoderTest: XCTestCase {
     }
     func test_getContentLength_Given7ByteLongLength_Expect_564333000221026() {
         var iterator = initialSetup(with: [0x87, 0x02, 0x01, 0x42, 0x04, 0x03, 0x61, 0x62, 0x63])
-        let asn1Length = try? sut.getContentLength(iterator: &iterator)
+         
+        let asn1Length = try? sut.getContentLength(iterator: &iterator, totalASN1ObjInUInt8Form: &totalASN1ObjInUInt8Form)
         XCTAssertNotNil(asn1Length, "Expected not nil but get nil")
         let finalvalue = Int(asn1Length!)
         XCTAssertEqual(finalvalue, 564333000221026, "Expected 564333000221026 but get \(finalvalue)")
     }
     func test_getContentLength_GivenCorruptedLengthdata_Expect_ASN1ErrorLengthEncodingError() {
         var iterator = initialSetup(with: [0x87, 0x02, 0x01])
+         
         do {
-            let length = try sut.getContentLength(iterator: &iterator)
+            let length = try sut.getContentLength(iterator: &iterator, totalASN1ObjInUInt8Form: &totalASN1ObjInUInt8Form)
             XCTFail("Expected error ASN1Error.lengthEncodingError, but got length: \(length)")
         } catch {
             XCTAssertTrue(error is ASN1Error, "Expected ASN1Error to be thrown.")
@@ -55,8 +61,9 @@ final class ASN1IDecoderTest: XCTestCase {
     }
     func test_getContentLength_GivenEmpty_Expect_0() {
         var iterator = initialSetup(with: [])
+         
         do {
-            let length = try sut.getContentLength(iterator: &iterator)
+            let length = try sut.getContentLength(iterator: &iterator, totalASN1ObjInUInt8Form: &totalASN1ObjInUInt8Form)
             XCTAssertEqual(length, 0, "Expected length is 0 but get \(length)")
         } catch {
             XCTFail("Some Error occure \(error)")
@@ -65,12 +72,14 @@ final class ASN1IDecoderTest: XCTestCase {
     // MARK: loadChildContent
     func test_loadChildContent_Given_CorrectIterator_Expect_NotThrowAnyError() {
         var iterator = initialSetup(with: [0x04, 0x02, 0x01, 0x04, 0x12])
-        XCTAssertNoThrow(try sut.loadChildContent(iterator: &iterator))
+         
+        XCTAssertNoThrow(try sut.loadChildContent(iterator: &iterator, totalASN1ObjInUInt8Form: &totalASN1ObjInUInt8Form))
     }
     func test_loadChildContent_Given_IncorrectIterator_Expect_OutOfBufferError() {
         var iterator = initialSetup(with: [0x04, 0x02, 0x01])
+         
         do {
-            _ = try sut.loadChildContent(iterator: &iterator)
+            _ = try sut.loadChildContent(iterator: &iterator, totalASN1ObjInUInt8Form: &totalASN1ObjInUInt8Form)
         } catch {
             XCTAssertTrue(error is ASN1Error, "Expected ASN1Error to be thrown.")
             XCTAssertEqual(error as? ASN1Error, ASN1Error.outOfBuffer, "Expected error ASN1Error.outOfBuffer.")
@@ -78,8 +87,9 @@ final class ASN1IDecoderTest: XCTestCase {
     }
     func test_loadChildContent_Given_CorrectIterator_Expect_ChieldContent() {
         var iterator = initialSetup(with: [0x03, 0x61, 0x62, 0x63])
+         
         do {
-            let childContent = try sut.loadChildContent(iterator: &iterator)
+            let childContent = try sut.loadChildContent(iterator: &iterator, totalASN1ObjInUInt8Form: &totalASN1ObjInUInt8Form)
             let resultedDataShouldBeLike = Data([0x61, 0x62, 0x63])
             XCTAssertEqual(childContent, resultedDataShouldBeLike)
         } catch {
@@ -88,8 +98,9 @@ final class ASN1IDecoderTest: XCTestCase {
     }
     func test_LoadChildContent_Given_EmptyInput() {
         var iterator = initialSetup(with: [])
+         
         do {
-            let contentData = try sut.loadChildContent(iterator: &iterator)
+            let contentData = try sut.loadChildContent(iterator: &iterator, totalASN1ObjInUInt8Form: &totalASN1ObjInUInt8Form)
             XCTAssertTrue(contentData.isEmpty, "Empty input should result in empty content data.")
         } catch {
             XCTFail("Unexpected error: \(error)")
@@ -115,28 +126,28 @@ final class ASN1IDecoderTest: XCTestCase {
     func test_handleOthersClassTypeIdentifire_Given_CorrectLengthAndData() {
         var asn1obj = ASN1Object()
         var iterator = initialSetup(with: [0x03, 0x61, 0x62, 0x63])
-        XCTAssertNoThrow(try sut.test_handleOthersClassTypeIdentifire(asn1obj: &asn1obj, atIteratio: &iterator))
+        XCTAssertNoThrow(try sut.test_handleOthersClassTypeIdentifire(asn1obj: &asn1obj, atIteratio: &iterator, totalASN1ObjInUInt8Form: &totalASN1ObjInUInt8Form))
         XCTAssertEqual(asn1obj.value as? String, "abc")
         XCTAssertEqual(asn1obj.rawValue, Data([0x61, 0x62, 0x63]))
     }
     func test_handleOthersClassTypeIdentifire_Given_LengthButInvalidData_Expect_Error_OutofBuffer() {
         var asn1obj = ASN1Object()
         var iterator = initialSetup(with: [0x03, 0x61, 0x62])
-        XCTAssertThrowsError(try sut.test_handleOthersClassTypeIdentifire(asn1obj: &asn1obj, atIteratio: &iterator))
+        XCTAssertThrowsError(try sut.test_handleOthersClassTypeIdentifire(asn1obj: &asn1obj, atIteratio: &iterator, totalASN1ObjInUInt8Form: &totalASN1ObjInUInt8Form))
         XCTAssertNil(asn1obj.value)
         XCTAssertNil(asn1obj.rawValue)
     }
     func test_handleOthersClassTypeIdentifire_Given_OnlyLength() {
         var asn1obj = ASN1Object()
         var iterator = initialSetup(with: [0x03])
-        XCTAssertThrowsError(try sut.test_handleOthersClassTypeIdentifire(asn1obj: &asn1obj, atIteratio: &iterator))
+        XCTAssertThrowsError(try sut.test_handleOthersClassTypeIdentifire(asn1obj: &asn1obj, atIteratio: &iterator, totalASN1ObjInUInt8Form: &totalASN1ObjInUInt8Form))
         XCTAssertNil(asn1obj.value)
         XCTAssertNil(asn1obj.rawValue)
     }
     func test_handleOthersClassTypeIdentifire_Given_Nothing() {
         var asn1obj = ASN1Object()
         var iterator = initialSetup(with: [])
-        XCTAssertNoThrow(try sut.test_handleOthersClassTypeIdentifire(asn1obj: &asn1obj, atIteratio: &iterator))
+        XCTAssertNoThrow(try sut.test_handleOthersClassTypeIdentifire(asn1obj: &asn1obj, atIteratio: &iterator, totalASN1ObjInUInt8Form: &totalASN1ObjInUInt8Form))
         XCTAssertNotNil(asn1obj.value)
         XCTAssertNotNil(asn1obj.rawValue)
     }
@@ -170,6 +181,14 @@ final class ASN1IDecoderTest: XCTestCase {
             XCTFail("should not through any error.")
         }
     }
+    
+    
+    func test_random() {
+        let stri = "30820122300d06092a864886f70d01010105000382010f003082010a0282010100be541df3ede409d2c431fa07609fe05d574ba2011d68bc7432c817270e92e7a894635db4081ae869e9db008f568558443b47482f625f2a7c5d3eaea2952ab156fe3e999864410bc70acc678bb7791f40b26d56e8fc59edc25ad1a1a384b773b26131688665872a433b0524dd542e26b03b9e334c065676c2d1691111f263a2559a46975572463f86f85154f7135193d2d0da8dbc4b620b25ea3eca9a9084751dc5374c9b604623a0ae5d7b08e9a27d97cdc6e9c51561a4d3af00d968fa88ddb8dc3b7330f4d8bf9b58724c02a0d004d328b899595a32b78a852c5f05c46ce1e6b17c8fde1244e6478eff5eb7ab93bf9640641e4965be0492699d5dac1e73e7ef0203010001"
+        let decoder = ASN1Decoder()
+        let obj = try? decoder.decode(data: stri.hexToData()!)
+        print(obj?.first?.description)
+    }
 }
 
 // MARK: Initial Setup
@@ -180,3 +199,28 @@ extension ASN1IDecoderTest {
         return iterator
     }
 }
+
+
+
+extension String {
+    func hexToData() -> Data? {
+        var hex = self
+        var data = Data()
+
+        while hex.count > 0 {
+            let index = hex.index(hex.startIndex, offsetBy: 2)
+            let hexByte = String(hex.prefix(upTo: index))
+            hex = String(hex.suffix(from: index))
+
+            if var byte = UInt8(hexByte, radix: 16) {
+                data.append(&byte, count: 1)
+            } else {
+                // Invalid hex character
+                return nil
+            }
+        }
+
+        return data
+    }
+}
+

@@ -26,8 +26,7 @@ final class AppleContainerTest: XCTestCase {
         }
         appleContainer = try? AppleContainer(data: validReceiptData)
         XCTAssertNotNil(appleContainer)
-        
-        let payloadData = appleContainer.AppleReceipt()
+        let payloadData = try? appleContainer.AppleReceipt()
         XCTAssertNotNil(payloadData)
     }
     
@@ -45,7 +44,7 @@ final class AppleContainerTest: XCTestCase {
         }
         // Act
         let appleContainer = try? AppleContainer(data: data)
-        guard let receipt = appleContainer?.AppleReceipt() else {
+        guard let receipt = try? appleContainer?.AppleReceipt() else {
             XCTFail("Invalid Receipt format")
             return
         }

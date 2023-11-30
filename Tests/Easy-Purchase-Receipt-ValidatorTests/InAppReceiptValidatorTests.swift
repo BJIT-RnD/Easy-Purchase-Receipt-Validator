@@ -24,15 +24,21 @@ class InAppReceiptValidatorTests: XCTestCase {
         guard let data = Data(base64Encoded: easyPurchaseSandboxReceipt) else {
             return
         }
-        let appleContainer = try? AppleContainer(data: data)
-        receiptInfo = appleContainer?.AppleReceipt()
+        var appleContainer = try? AppleContainer(data: data)
+        receiptInfo = try? appleContainer?.AppleReceipt()
 
         // Setting up the test environment for invalid receipt
         guard let dataInvalid = Data(base64Encoded: easyPurchaseInvalidSandboxReceipt) else {
             return
         }
         let appleContainerInvalid = try? AppleContainer(data: dataInvalid)
-        invalidReceiptInfo = appleContainerInvalid?.AppleReceipt()
+        invalidReceiptInfo = try? appleContainerInvalid?.AppleReceipt()
+        
+        self.temCheck(obj: &appleContainer!)
+    }
+    
+    func temCheck(obj: inout AppleContainer) {
+        obj.getCertificate()
     }
 
     override func tearDown() {
