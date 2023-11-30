@@ -110,14 +110,8 @@ extension AppleContainer {
                 break
             }
         }
-        let interface = InAppReceiptValidator(payloadData)
-        // Validation is not essential in testing environment
-        if let _ = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] {
-            return interface
-        }
-        try interface.isValidReceipt()
         // Return the Interface object containing the extracted information.
-        return interface
+        return InAppReceiptValidator(payloadData)
     }
 
     /// Processes a list of ASN.1 sub-items representing in-app purchase information and extracts relevant details into a `PurchaseData` object.
