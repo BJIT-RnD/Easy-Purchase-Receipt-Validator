@@ -10,6 +10,9 @@ public enum ReceiptError: Error {
     case invalidURL
     case verificationFailed
     case invalidReceiptBlock
+    case notAutoRenewableProduct
+    case productIsCancelled
+    case productNotPurchased
     /// Dectects Error
     /// - Parameter url: receipt loading url
     ///
