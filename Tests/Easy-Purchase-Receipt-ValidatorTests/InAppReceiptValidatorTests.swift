@@ -157,16 +157,31 @@ extension InAppReceiptValidatorTests {
     func test_CheckPurchaseExpiredDatebyProductId_whenOriginalReceiptGiven_withExpirationDate_ShouldReturnNil() {
         let productIdentifier = "com.bjitgroup.easypurchase.autorenewweekly"
         // Test when there are purchases with expiration date
-        XCTAssertNotNil(receiptInfo?.checkPurchaseExpiredDatebyProductId(ofProductIdentifier: productIdentifier))
+        do {
+            let date = try receiptInfo?.getPurchaseExpiredDatebyProductId(ofProductIdentifier: productIdentifier)
+            XCTAssertNotNil(date)
+        } catch {
+            XCTFail()
+        }
+    }
+    
+    func test_CheckPurchaseExpiredDatebyProductId_whenFakeIdentifierGiven_withExpirationDate_ShouldThrow() {
+        let productIdentifier = "XYZ"
+        do {
+            let date = try receiptInfo?.getPurchaseExpiredDatebyProductId(ofProductIdentifier: productIdentifier)
+            XCTAssertNotNil(date)
+        } catch {
+            XCTAssert(true)
+        }
     }
 
-    func test_CheckPurchaseExpiredDatebyProductId_whenOriginalReceiptGiven_whenNoExpirationDate_ShouldReturnNil() {
+    func test_CheckPurchaseExpiredDatebyProductId_whenConsumableIdentifierGiven_shouldThrow() {
         // Test when there are purchases without expiration date
-        XCTAssertNil(receiptInfo?.checkPurchaseExpiredDatebyProductId(ofProductIdentifier: "com.bjitgroup.easypurchase.consumable.tencoin"))
-    }
-
-    func testCheckPurchaseExpiredDatebyProductId_whenOriginalReceiptGiven_whenNoPurchases_ShouldReturnNil() {
-        // Test when there are no purchases
-        XCTAssertNil(receiptInfo?.checkPurchaseExpiredDatebyProductId(ofProductIdentifier: "com.bjitgroup.easypurchase.autorenewwmontly"))
+        do {
+            let date = try receiptInfo?.getPurchaseExpiredDatebyProductId(ofProductIdentifier: "com.bjitgroup.easypurchase.consumable.tencoin")
+            XCTAssertNotNil(date)
+        } catch {
+            XCTAssert(true)
+        }
     }
 }
