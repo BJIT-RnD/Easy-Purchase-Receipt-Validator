@@ -33,16 +33,16 @@ public protocol InAppReceiptValidatorProtocol {
     func checkPurchaseExpiredDatebyProductId(ofProductIdentifier productIdentifier: String) -> Date?
     func allPurchasesByProductId(ofProductIdentifier productIdentifier: String,
                    sortedBy sort: ((PurchaseData, PurchaseData) -> Bool)?) -> [PurchaseData]
-    func currentlyActiveAutoRenewableSubscriptionPurchasesByDate(ofProductIdentifier productIdentifier: String, forDate date: Date) -> PurchaseData?
-    func currentlyActiveAutoRenewableSubscriptionPurchases(ofProductIdentifier productIdentifier: String) -> PurchaseData?
+    func isActiveAutoRenewableByDate(ofProductIdentifier productIdentifier: String, forDate date: Date) throws -> PurchaseData?
+    func isCurrentlyActiveAutoRenewable(ofProductIdentifier productIdentifier: String) throws -> PurchaseData?
     var allAutoRenewables: [PurchaseData] { get }
-    var activeAutoRenewables: [PurchaseData] { get }
-    func isValidReceipt() throws
+    func activeAutoRenewables() throws -> [PurchaseData]
+    func isValidReceipt() throws -> Bool
 }
 
 // MARK: - InAppReceiptValidator Class
 
-public class InAppReceiptValidator: InAppReceiptValidatorProtocol {
+public final class InAppReceiptValidator: InAppReceiptValidatorProtocol {
     // ReceiptInfo instance to hold hardcoded values
     private var processedFinalPayload: PayloadData
 
@@ -74,12 +74,12 @@ public extension InAppReceiptValidator {
 
     /// Used to validate the receipt
     var bundleIdentifierData: Data? {
-        return processedFinalPayload.bundleIdentifierData // ?? Data()
+        return processedFinalPayload.bundleIdentifierData
     }
 
     /// An opaque value used, with other data, to compute the SHA-1 hash during validation.
     var opaqueValue: Data? {
-        return processedFinalPayload.opaqueValue // ?? Data()
+        return processedFinalPayload.opaqueValue
     }
 
     /// A SHA-1 hash, used to validate the receipt.
@@ -113,23 +113,24 @@ public extension InAppReceiptValidator {
     }
 
     /// Returns `true` if any purchases exist, `false` otherwise
-    var hasPurchases: Bool? {
+    var hasPurchases: Bool {
         guard let purchases = purchases else {
-            return nil 
+            return false
         }
         return !purchases.isEmpty
     }
 }
 
-// MARK: - IInAppReceiptValidator Extension
+// MARK: - InAppReceiptValidator Extension
 
 /// An extension on InAppReceipt to facilitate receipt validation.
 public extension InAppReceiptValidator {
     /// Determine whether the receipt is valid or not.
     ///
     /// - Returns: `true` if the receipt is valid, otherwise `false`.
-    func isValidReceipt() throws {
+    func isValidReceipt() throws -> Bool {
         try validateReceipt()
+        return true
     }
 
     /// Validate In-App Receipt.
@@ -320,11 +321,11 @@ extension InAppReceiptValidator {
     ///   - date: The date for which the subscription's status is checked.
     /// - Returns: The active auto-renewable subscription purchase, or `nil` if none is found.
     ///
-    public func currentlyActiveAutoRenewableSubscriptionPurchasesByDate(ofProductIdentifier productIdentifier: String, forDate date: Date) -> PurchaseData? {
+    public func isActiveAutoRenewableByDate(ofProductIdentifier productIdentifier: String, forDate date: Date) throws -> PurchaseData? {
         let filteredbyProductId = allPurchasesByProductId(ofProductIdentifier: productIdentifier)
 
         for purchase in filteredbyProductId {
-            if purchase.checkActiveAutoRenewableSubscriptionByProductId(forDate: date) {
+            if try purchase.isActiveAutoRenewable(forDate: date) {
                 return purchase
             }
         }
@@ -339,11 +340,11 @@ extension InAppReceiptValidator {
     ///   - productIdentifier: The product identifier.
     /// - Returns: The active auto-renewable subscription purchase by checking current date using Date(), or `nil` if none is found.
     ///
-    public func currentlyActiveAutoRenewableSubscriptionPurchases(ofProductIdentifier productIdentifier: String) -> PurchaseData? {
+    public func isCurrentlyActiveAutoRenewable(ofProductIdentifier productIdentifier: String) throws -> PurchaseData? {
         let filteredbyProductId = allPurchasesByProductId(ofProductIdentifier: productIdentifier)
         let date = Date()
         for purchase in filteredbyProductId {
-            if purchase.checkActiveAutoRenewableSubscriptionByProductId(forDate: date) {
+            if try purchase.isActiveAutoRenewable(forDate: date) {
                 return purchase
             }
         }
@@ -375,13 +376,13 @@ extension InAppReceiptValidator {
     ///
     /// - Returns: The list of all the active auto-renewable subscription purchase ever done by the user.
     ///
-    public var activeAutoRenewables: [PurchaseData] {
+    public func activeAutoRenewables() throws -> [PurchaseData] {
         var activeAutoRenews: [PurchaseData] = []
         guard let purchases = purchases else {
             return activeAutoRenews
         }
         for purchase in purchases {
-            if purchase.isAutoRenewProduct && purchase.isActiveAutoRenewable() {
+            if try (purchase.isAutoRenewProduct && purchase.isActiveAutoRenewable()) {
                 activeAutoRenews.append(purchase)
             }
         }

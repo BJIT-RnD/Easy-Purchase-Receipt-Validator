@@ -37,20 +37,20 @@ public extension PurchaseData {
     ///
     /// - Parameter date: The date for which the auto-renewable subscription status is checked.
     /// - Returns: `true` if the latest auto-renewable subscription is active for the given date, `false` otherwise.
-    func checkActiveAutoRenewableSubscriptionByProductId(forDate date: Date) -> Bool {
+    func isActiveAutoRenewable(forDate date: Date = Date()) throws -> Bool {
         // If the subscription has been canceled, it is not active.
         guard cancellationDate == nil else {
-            return false
+            throw ReceiptError.productIsCancelled
         }
 
         // If there is no expiration date, the subscription is not active.
         guard let expirationDate = expiresDate else {
-            return false
+            throw ReceiptError.notAutoRenewableProduct
         }
 
         // If there is no purchase date, the subscription is not active.
         guard let purchasedDate = purchaseDate else {
-            return false
+            throw ReceiptError.productNotPurchased
         }
 
         // Check if the date is within the valid range of the subscription.
@@ -61,23 +61,5 @@ public extension PurchaseData {
     /// - Returns: `true` if the product is auto-renewable, else false
     var isAutoRenewProduct: Bool {
         return expiresDate != nil
-    }
-    
-    /// Checks whether the  auto-renewable product is currently active
-    /// - Returns: `true` if the  auto-renewable product is active
-    func isActiveAutoRenewable(forDate date: Date = Date()) -> Bool {
-        if cancellationDate != nil {
-            return false
-        }
-        
-        guard let expirationDate = expiresDate else {
-            return false
-        }
-        
-        guard let purchaseDate = purchaseDate else {
-            return false
-        }
-        
-        return date >= purchaseDate && date < expirationDate
     }
 }

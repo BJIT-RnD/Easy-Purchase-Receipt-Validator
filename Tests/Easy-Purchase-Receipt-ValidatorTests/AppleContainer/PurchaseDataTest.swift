@@ -36,44 +36,46 @@ final class PurchaseDataTest: XCTestCase {
         let appleContainer = try? AppleContainer(data: data)
         let receiptInfo = try? appleContainer?.AppleReceipt()
         // When
-        let totalActivePurchase = receiptInfo?.activeAutoRenewables
-        // Then
-        XCTAssertEqual(totalActivePurchase?.count, 0, "There should be total 0 active auto-renew products in the test receipt.")
+        do {
+            let totalActivePurchase = try receiptInfo?.activeAutoRenewables()
+            // Then
+            XCTAssertEqual(totalActivePurchase?.count, 0, "There should be total 0 active auto-renew products in the test receipt.")
+        } catch {
+            // Then
+            XCTFail()
+        }
     }
     
     func test_PurchaseData_whenCancelDateExist_isActiveAutoRenewableShouldReturnFalse() {
         // Arrange
-        let product = PurchaseData(quantities: 1, productIdentifier: "abcd", transactionId: "1234", originalTransactionId: "1234", purchaseDate: Date(), originalPurchaseDate: Date(), expiresDate: Date(), isInIntroOfferPeriod: 1, webOrderLineItemId: 1 )
-        // Act
-        let activeStatus = product.isActiveAutoRenewable()
+        let product = PurchaseData(quantities: 1, productIdentifier: "abcd", transactionId: "1234", originalTransactionId: "1234", purchaseDate: Date(), originalPurchaseDate: Date(), expiresDate: Date(), isInIntroOfferPeriod: 1, cancellationDate: Date(), webOrderLineItemId: 1 )
         // Assert
-        XCTAssertFalse(activeStatus)
+        XCTAssertThrowsError(try product.isActiveAutoRenewable())
     }
     
     func test_PurchaseData_whenExpireDateNotExist_isActiveAutoRenewableShouldReturnFalse() {
         // Arrange
         let product = PurchaseData(quantities: 1, productIdentifier: "abcd", transactionId: "1234", originalTransactionId: "1234", purchaseDate: Date(), originalPurchaseDate: Date(), isInIntroOfferPeriod: 1, webOrderLineItemId: 1 )
-        // Act
-        let activeStatus = product.isActiveAutoRenewable()
         // Assert
-        XCTAssertFalse(activeStatus)
+        XCTAssertThrowsError(try product.isActiveAutoRenewable())
     }
     
     func test_PurchaseData_whenPurchaseDateNotExist_isActiveAutoRenewableShouldReturnFalse() {
         // Arrange
         let product = PurchaseData(quantities: 1, productIdentifier: "abcd", transactionId: "1234", originalTransactionId: "1234", originalPurchaseDate: Date(), expiresDate: Date(), isInIntroOfferPeriod: 1, webOrderLineItemId: 1 )
-        // Act
-        let activeStatus = product.isActiveAutoRenewable()
         // Assert
-        XCTAssertFalse(activeStatus)
+        XCTAssertThrowsError(try product.isActiveAutoRenewable())
     }
     func test_PurchaseData_whenProductIsActive_isActiveAutoRenewableShouldReturnTrue() {
         // Arrange
         let product = PurchaseData(quantities: 1, productIdentifier: "abcd", transactionId: "1234", originalTransactionId: "1234", purchaseDate: Date(), originalPurchaseDate: Date(), expiresDate: Date() + 10, isInIntroOfferPeriod: 1, webOrderLineItemId: 1 )
         // Act
-        let activeStatus = product.isActiveAutoRenewable()
-        // Assert
-        XCTAssertTrue(activeStatus)
+        do {
+            let activeStatus = try product.isActiveAutoRenewable()
+            XCTAssertTrue(activeStatus)
+        } catch {
+            XCTFail()
+        }
     }
     func test_PurchaseData_whenProductHasExpireDate_isAutoRenewProductShouldReturnTrue() {
         // Arrange
