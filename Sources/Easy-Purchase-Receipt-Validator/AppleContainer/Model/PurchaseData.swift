@@ -40,17 +40,17 @@ public extension PurchaseData {
     func isActiveAutoRenewable(forDate date: Date = Date()) throws -> Bool {
         // If the subscription has been canceled, it is not active.
         guard cancellationDate == nil else {
-            throw ReceiptError.productIsCancelled
+            throw PurchaseDataError.productIsCancelled
         }
 
         // If there is no expiration date, the subscription is not active.
         guard let expirationDate = expiresDate else {
-            throw ReceiptError.notAutoRenewableProduct
+            throw PurchaseDataError.notAutoRenewableProduct
         }
 
         // If there is no purchase date, the subscription is not active.
         guard let purchasedDate = purchaseDate else {
-            throw ReceiptError.productNotPurchased
+            throw PurchaseDataError.productNotPurchased
         }
 
         // Check if the date is within the valid range of the subscription.

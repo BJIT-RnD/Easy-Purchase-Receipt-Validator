@@ -30,7 +30,7 @@ public protocol InAppReceiptValidatorProtocol {
     func checkExpirationDateValid() -> Bool
     func originalTransactionIdentifier(ofProductIdentifier productIdentifier: String) -> String?
     func containsPurchase(ofProductIdentifier productIdentifier: String) -> Bool
-    func checkPurchaseExpiredDatebyProductId(ofProductIdentifier productIdentifier: String) -> Date?
+    func getPurchaseExpiredDatebyProductId(ofProductIdentifier productIdentifier: String) throws -> Date?
     func allPurchasesByProductId(ofProductIdentifier productIdentifier: String,
                    sortedBy sort: ((PurchaseData, PurchaseData) -> Bool)?) -> [PurchaseData]
     func isActiveAutoRenewableByDate(ofProductIdentifier productIdentifier: String, forDate date: Date) throws -> PurchaseData?
@@ -52,7 +52,7 @@ public final class InAppReceiptValidator: InAppReceiptValidatorProtocol {
     }
 }
 
-// MARK: - InAppReceiptValidator Extension
+// MARK: - InAppReceiptValidator Extension : Providing the access for basic components of the given receipt
 
 public extension InAppReceiptValidator {
     /// The app’s bundle identifier
@@ -121,7 +121,7 @@ public extension InAppReceiptValidator {
     }
 }
 
-// MARK: - InAppReceiptValidator Extension
+// MARK: - InAppReceiptValidator Extension: Providing the validation of the given receipt.
 
 /// An extension on InAppReceipt to facilitate receipt validation.
 public extension InAppReceiptValidator {
@@ -234,7 +234,7 @@ public extension InAppReceiptValidator {
     }
 }
 
-// MARK: - InAppReceiptValidator Extension
+// MARK: - InAppReceiptValidator Extension: Parsing different purchases data for different products of the given receipt
 
 extension InAppReceiptValidator {
     // MARK: Original Transaction Identifier
@@ -273,12 +273,11 @@ extension InAppReceiptValidator {
     ///
     /// - Parameter productIdentifier: The product identifier.
     /// - Returns: The expiration date, or `nil` if no purchases exist or the expiration date is `nil`.
-    public func checkPurchaseExpiredDatebyProductId(ofProductIdentifier productIdentifier: String) -> Date? {
+    public func getPurchaseExpiredDatebyProductId(ofProductIdentifier productIdentifier: String) throws -> Date? {
         guard let purchased = allPurchasesByProductId(ofProductIdentifier: productIdentifier).first,
               let expirationDate = purchased.expiresDate else {
-            return nil
+            throw PurchaseDataError.expireDateNotAvailable
         }
-
         return expirationDate
     }
 
