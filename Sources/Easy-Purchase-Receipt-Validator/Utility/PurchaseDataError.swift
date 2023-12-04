@@ -10,4 +10,6 @@ public enum PurchaseDataError: Error {
     case productIsCancelled
     case productNotPurchased
     case expireDateNotAvailable
+    case notNonRenewableProduct
+    case purchaseDateNotAvailable
 }
