@@ -31,3 +31,35 @@ public struct PurchaseData {
     public var cancellationDate: Date?
     public var webOrderLineItemId: UInt64?
 }
+
+public extension PurchaseData {
+    /// Checks whether the auto-renewable subscription is active for a specific date.
+    ///
+    /// - Parameter date: The date for which the auto-renewable subscription status is checked.
+    /// - Returns: `true` if the latest auto-renewable subscription is active for the given date, `false` otherwise.
+    func isActiveAutoRenewable(forDate date: Date = Date()) throws -> Bool {
+        // If the subscription has been canceled, it is not active.
+        guard cancellationDate == nil else {
+            throw PurchaseDataError.productIsCancelled
+        }
+
+        // If there is no expiration date, the subscription is not active.
+        guard let expirationDate = expiresDate else {
+            throw PurchaseDataError.notAutoRenewableProduct
+        }
+
+        // If there is no purchase date, the subscription is not active.
+        guard let purchasedDate = purchaseDate else {
+            throw PurchaseDataError.productNotPurchased
+        }
+
+        // Check if the date is within the valid range of the subscription.
+        return date >= purchasedDate && date < expirationDate
+    }
+    
+    /// Checks whether the product is auto-renewable type
+    /// - Returns: `true` if the product is auto-renewable, else false
+    var isAutoRenewProduct: Bool {
+        return expiresDate != nil
+    }
+}

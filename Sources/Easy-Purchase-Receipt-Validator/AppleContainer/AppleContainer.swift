@@ -9,7 +9,7 @@ protocol AppleContainerProtocol {
     var coreBlock: ASN1Object { get }
     var algorithm: String? { get }
     var detectAlgorithmName: String? { get }
-    func AppleReceipt() throws -> InAppReceiptValidator?
+    func AppleReceipt() throws -> InAppReceiptValidatorProtocol
 }
 /**
  The `AppleContainer` class is responsible for handling Apple Container data. It extracts information from the ASN.1 structure in the Apple Container.
