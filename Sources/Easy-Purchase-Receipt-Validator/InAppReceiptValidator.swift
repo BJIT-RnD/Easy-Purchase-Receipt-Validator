@@ -111,14 +111,6 @@ public extension InAppReceiptValidator {
     var purchases: [PurchaseData]? {
         return processedFinalPayload.inAppPurchasesReceipt
     }
-
-    /// Returns `true` if any purchases exist, `false` otherwise
-    var hasPurchases: Bool {
-        guard let purchases = purchases else {
-            return false
-        }
-        return !purchases.isEmpty
-    }
 }
 
 // MARK: - InAppReceiptValidator Extension: Providing the validation of the given receipt.
