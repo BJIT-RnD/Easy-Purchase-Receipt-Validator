@@ -185,3 +185,70 @@ extension InAppReceiptValidatorTests {
         }
     }
 }
+
+extension InAppReceiptValidatorTests {
+    func test_isNonRenewableActive_whenHaveSubscription_shouldreturnTrue() {
+        let nov_10_2023 = Calendar.current.date(from: DateComponents(year: 2023, month: 11, day: 10))!
+        do {
+            let status = try receiptInfo?.isNonRenewableActive(productIdentifier: "com.bjitgroup.easypurchase.nonRenewable.thirty", validForDay: 10, currentDate: nov_10_2023)
+            XCTAssertTrue(status == true, "The non-renewable subscription shoud valid till Nov 10, 2023")
+        } catch {
+            XCTFail()
+        }
+    }
+    
+    func test_isNonRenewableActive_whenSubscriptionFinished_shouldreturnFalse() {
+        let nov_20_2023 = Calendar.current.date(from: DateComponents(year: 2023, month: 11, day: 20))!
+        do {
+            let status = try receiptInfo?.isNonRenewableActive(productIdentifier: "com.bjitgroup.easypurchase.nonRenewable.thirty", validForDay: 10, currentDate: nov_20_2023)
+            XCTAssertTrue(status == false, "The non-renewable subscription should not valid till Nov 10, 2023")
+        } catch {
+            XCTFail()
+        }
+    }
+    func test_isNonRenewableActive_whenReceiptDoesNotContentPurchase_shouldthrowError() {
+        do {
+            let invalidIdentifier = "XYZ"
+            _ = try receiptInfo?.isNonRenewableActive(productIdentifier: invalidIdentifier, validForDay: 10, currentDate: Date())
+            XCTFail()
+        } catch {
+           XCTAssert(true)
+        }
+    }
+    func test_isNonRenewableActive_whenIdentifierAutoRenewProduct_shouldthrowError() {
+        do {
+            let autoRenewProductIdentifier = "com.bjitgroup.easypurchase.autorenewyearly"
+            _ = try receiptInfo?.isNonRenewableActive(productIdentifier: autoRenewProductIdentifier, validForDay: 10, currentDate: Date())
+            XCTFail()
+        } catch {
+           XCTAssert(true)
+        }
+    }
+    func test_isNonRenewableActiveMonth_whenHaveSubscription_shouldreturnTrue() {
+        let feb_28_2024 = Calendar.current.date(from: DateComponents(year: 2024, month: 2, day: 28))
+        do {
+            let status = try receiptInfo?.isNonRenewableActive(productIdentifier: "com.bjitgroup.easypurchase.nonRenewable.thirty", validForMonth: 5, currentDate: feb_28_2024 ?? Date())
+            XCTAssertTrue(status == true, "The non-renewable subscription shoud valid till Nov 10, 2023")
+        } catch {
+            XCTFail()
+        }
+    }
+    func test_isNonRenewableActiveMonth_whenSubscriptionEnded_shouldreturnFalse() {
+        let january = Calendar.current.date(from: DateComponents(year: 2024, month: 2, day: 30))
+        do {
+            let status = try receiptInfo?.isNonRenewableActive(productIdentifier: "com.bjitgroup.easypurchase.nonRenewable.thirty", validForMonth: 2, currentDate: january!)
+            XCTAssertTrue(status == false, "The non-renewable subscription shoud valid till Nov 10, 2023")
+        } catch {
+            XCTFail()
+        }
+    }
+    func test_isNonRenewableActiveYear_whenHaveSubscription_shouldreturnTrue() {
+        let feb_28_2024 = Calendar.current.date(from: DateComponents(year: 2025, month: 2, day: 28))
+        do {
+            let status = try receiptInfo?.isNonRenewableActive(productIdentifier: "com.bjitgroup.easypurchase.nonRenewable.thirty", validForYear: 5, currentDate: feb_28_2024 ?? Date())
+            XCTAssertTrue(status == true, "The non-renewable subscription shoud valid till Nov 10, 2023")
+        } catch {
+            XCTFail()
+        }
+    }
+}
