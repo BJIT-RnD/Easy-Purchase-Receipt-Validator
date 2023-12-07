@@ -62,4 +62,7 @@ public extension PurchaseData {
     var isAutoRenewProduct: Bool {
         return expiresDate != nil
     }
+    var hasIntroductoryPeriod: Bool {
+        return isInIntroOfferPeriod != nil
+    }
 }
