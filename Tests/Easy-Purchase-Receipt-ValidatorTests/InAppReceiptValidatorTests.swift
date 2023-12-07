@@ -228,7 +228,7 @@ extension InAppReceiptValidatorTests {
         let feb_28_2024 = Calendar.current.date(from: DateComponents(year: 2024, month: 2, day: 28))
         do {
             let status = try receiptInfo?.isNonRenewableActive(productIdentifier: "com.bjitgroup.easypurchase.nonRenewable.thirty", validForMonth: 5, currentDate: feb_28_2024 ?? Date())
-            XCTAssertTrue(status == true, "The non-renewable subscription shoud valid till Nov 10, 2023")
+            XCTAssertTrue(status == true, "The non-renewable subscription should valid till Feb 28, 2024")
         } catch {
             XCTFail()
         }
@@ -237,7 +237,7 @@ extension InAppReceiptValidatorTests {
         let january = Calendar.current.date(from: DateComponents(year: 2024, month: 2, day: 30))
         do {
             let status = try receiptInfo?.isNonRenewableActive(productIdentifier: "com.bjitgroup.easypurchase.nonRenewable.thirty", validForMonth: 2, currentDate: january!)
-            XCTAssertTrue(status == false, "The non-renewable subscription shoud valid till Nov 10, 2023")
+            XCTAssertTrue(status == false, "The non-renewable subscription should not valid till Feb 28, 2024")
         } catch {
             XCTFail()
         }
@@ -246,7 +246,7 @@ extension InAppReceiptValidatorTests {
         let feb_28_2024 = Calendar.current.date(from: DateComponents(year: 2025, month: 2, day: 28))
         do {
             let status = try receiptInfo?.isNonRenewableActive(productIdentifier: "com.bjitgroup.easypurchase.nonRenewable.thirty", validForYear: 5, currentDate: feb_28_2024 ?? Date())
-            XCTAssertTrue(status == true, "The non-renewable subscription shoud valid till Nov 10, 2023")
+            XCTAssertTrue(status == true, "The non-renewable subscription shoud valid till Feb 28, 2025")
         } catch {
             XCTFail()
         }
