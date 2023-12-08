@@ -25,7 +25,7 @@ final class CertificateParser {
         case extensions = 7
     }
     
-    init<obj:ASN1Object> (asn1: obj) throws {
+    init<Obj:ASN1Object> (asn1: Obj) throws {
         guard let firstBlock = asn1.childASN1Object(at: 0) else { throw ASN1Error.parseError }
         self.mainAsn1Object = asn1
         self.dataBlock = firstBlock

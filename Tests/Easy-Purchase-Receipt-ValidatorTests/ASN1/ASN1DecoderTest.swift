@@ -207,7 +207,7 @@ extension String {
         var hex = self
         var data = Data()
 
-        while hex.count > 0 {
+        while !hex.isEmpty {
             let index = hex.index(hex.startIndex, offsetBy: 2)
             let hexByte = String(hex.prefix(upTo: index))
             hex = String(hex.suffix(from: index))
