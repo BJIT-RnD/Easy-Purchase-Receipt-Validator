@@ -125,6 +125,8 @@ extension AppleContainer {
             throw AppleContainerErrors.signatureNotAvailable
         }
         return InAppReceiptValidator(withPayLoad: withPayLoad, signatures: signatures, andReceipt: receipt, iTunesPublicKey: publicKey)
+        // Return the Interface object containing the extracted information.
+        return InAppReceiptValidator(payloadData)
     }
 
     /// Processes a list of ASN.1 sub-items representing in-app purchase information and extracts relevant details into a `PurchaseData` object.
