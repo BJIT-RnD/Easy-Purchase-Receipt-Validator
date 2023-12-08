@@ -37,8 +37,6 @@ extension AppleContainer {
         case cancellationDate = 1712
         case webOrderLine = 1711
     }
-
-    // MARK: - Date Processing
     
     /// Processes a date string and returns a Date object if parsing is successful.
     ///
@@ -47,8 +45,6 @@ extension AppleContainer {
     private func processDate(_ dateString: String) -> Date? {
         return ReceiptDateParser.parseDate(from: dateString)
     }
-    
-    // MARK: - Apple Receipt Processing
     
     /// Processes the Apple Receipt and extracts relevant information into a PayloadData object.
     ///
@@ -110,8 +106,25 @@ extension AppleContainer {
                 break
             }
         }
-        // Return the Interface object containing the extracted information.
-        return InAppReceiptValidator(payloadData)
+        return try inAppReceiptValidatorBuilder(withPayLoad: payloadData)
+    }
+    
+    /**
+     Responsible to build `inAppReceiptValidator` object.
+     - Parameters:
+        - withPayLoad : Give receipt as a data
+     - Returns: inAppReceiptValidator object
+     */
+    private func inAppReceiptValidatorBuilder(withPayLoad: PayloadData) throws -> InAppReceiptValidator {
+        let signatures = try self.getSignatures()
+        guard let certificate = self.getOnlySignatureValidationCertificate(),
+              let publicKey = certificate.publicKeyInDataForsignatureValidation() else {
+            throw AppleContainerErrors.certificatePublicKeyNotAvailable
+        }
+        guard let receipt = coreBlock.findASN1Object(of: .pkcs7data)?.parent?.childs?.last?.childASN1Object(at: 0)?.rawValue else {
+            throw AppleContainerErrors.signatureNotAvailable
+        }
+        return InAppReceiptValidator(withPayLoad: withPayLoad, signatures: signatures, andReceipt: receipt, iTunesPublicKey: publicKey)
     }
 
     /// Processes a list of ASN.1 sub-items representing in-app purchase information and extracts relevant details into a `PurchaseData` object.
@@ -188,8 +201,6 @@ extension AppleContainer {
                     break
             }
         }
-
-        // Return the populated PurchaseData object containing in-app purchase information.
         return inAppPurchaseData
     }
 }

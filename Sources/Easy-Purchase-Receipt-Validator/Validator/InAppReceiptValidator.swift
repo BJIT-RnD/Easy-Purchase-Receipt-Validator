@@ -7,6 +7,7 @@
 
 import Foundation
 import CommonCrypto
+import Security
 #if canImport(UIKit)
 import UIKit
 #endif
@@ -41,14 +42,19 @@ public protocol InAppReceiptValidatorProtocol {
 }
 
 // MARK: - InAppReceiptValidator Class
-
 public final class InAppReceiptValidator: InAppReceiptValidatorProtocol {
     // ReceiptInfo instance to hold hardcoded values
-    private var processedFinalPayload: PayloadData
+    private let processedFinalPayload : PayloadData
+    private let signatures : [SignatureInfo]
+    private let iTunesPublicKey: Data
+    let receiptBlock: Data
 
     /// Initializes an InAppReceipt instance with hardcoded ReceiptInfo values.
-    public init(_ receiptInfo: PayloadData) {
-        self.processedFinalPayload = receiptInfo
+    public init(withPayLoad: PayloadData, signatures: [SignatureInfo], andReceipt: Data, iTunesPublicKey: Data) {
+        self.processedFinalPayload = withPayLoad
+        self.signatures = signatures
+        self.receiptBlock = andReceipt
+        self.iTunesPublicKey = iTunesPublicKey
     }
 }
 
@@ -131,6 +137,7 @@ public extension InAppReceiptValidator {
     private func validateReceipt() throws {
         try verifyHash()
         try checkBundleIdentifierAndVersion()
+        _ = try assambleAndverifySignature()
     }
 
     /// Verify that the bundle identifier in the receipt matches a hard-coded constant containing the CFBundleIdentifier value you expect in the Info.plist file.
@@ -226,8 +233,42 @@ public extension InAppReceiptValidator {
     }
 }
 
+extension InAppReceiptValidator{
+    private func getSecterPublicKey(from iTunesPublicKeyContainer: Data) throws -> SecKey {
+        let keyDict: [String:Any] =
+        [
+            kSecAttrKeyClass as String: kSecAttrKeyClassPublic,
+            kSecAttrKeyType as String: kSecAttrKeyTypeRSA,
+            kSecAttrKeySizeInBits as String: 2048,
+        ]
+        guard let iTunesPublicKeySec = SecKeyCreateWithData(iTunesPublicKeyContainer as CFData, keyDict as CFDictionary, nil) else {
+            throw ValidationError.validationFailed(reason: .signatureValidation(.unableToLoadAppleIncPublicSecKey))
+        }
+        return iTunesPublicKeySec
+    }
+    private func assambleAndverifySignature() throws -> Bool {
+        let appleRootCertificatePublicKey = try getSecterPublicKey(from: iTunesPublicKey)
+        guard let firstSignature = signatures.first,
+              let signatureRawData = firstSignature.signatureData else {
+            throw ValidationError.validationFailed(reason: .signatureValidation(.receiptSignedDataNotFound))
+        }
+        return try verifySignature(signature: signatureRawData, withPublicKey: appleRootCertificatePublicKey, forData: receiptBlock)
+    }
+    
+    private func verifySignature(signature: Data, withPublicKey publicKey: SecKey, forData data: Data) throws -> Bool {
+        let algorithm: SecKeyAlgorithm = .rsaSignatureMessagePKCS1v15SHA1
+        var error: Unmanaged<CFError>?
+        let result = SecKeyVerifySignature(publicKey, algorithm, data as CFData, signature as CFData, &error)
+        if !result {
+            if let err = error?.takeRetainedValue(){
+                print(err)
+                throw ValidationError.validationFailed(reason: .signatureValidation(.invalidSignature))
+            }
+        }
+        return result
+    }
+}
 // MARK: - InAppReceiptValidator Extension: Parsing different purchases data for different products of the given receipt
-
 extension InAppReceiptValidator {
     // MARK: Original Transaction Identifier
 

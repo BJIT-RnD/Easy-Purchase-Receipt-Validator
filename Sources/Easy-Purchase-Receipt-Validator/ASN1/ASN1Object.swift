@@ -25,6 +25,8 @@ public final class ASN1Object {
     public var identifier: ASN1Identifier?
     /// Store the raw byte value of ASN1Object value property
     public var rawValue: Data?
+    /// Store full ASN1Object container byte in data format. Have identifire, length and value data also.
+    public var asn1Container: [UInt8]?
     /// This property contains ASN1 decoded Swift object whenever is possible
     public var value: Any?
     /// Hold reference of child ASN1Objects
@@ -33,6 +35,13 @@ public final class ASN1Object {
     public internal(set) weak var parent: ASN1Object?
     public var description: String {
         return printAsn1()
+    }
+    
+    public var asn1ContainerAsData: Data? {
+        if let asn1Container = asn1Container {
+            return Data(asn1Container)
+        }
+        return nil
     }
     
     public var asString: String? {

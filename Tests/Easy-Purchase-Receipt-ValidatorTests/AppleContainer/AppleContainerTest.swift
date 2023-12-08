@@ -26,7 +26,6 @@ final class AppleContainerTest: XCTestCase {
         }
         appleContainer = try? AppleContainer(data: validReceiptData)
         XCTAssertNotNil(appleContainer)
-        
         let payloadData = try? appleContainer.AppleReceipt()
         XCTAssertNotNil(payloadData)
     }
