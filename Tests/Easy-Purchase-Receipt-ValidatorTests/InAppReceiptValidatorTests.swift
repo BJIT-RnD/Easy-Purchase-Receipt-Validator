@@ -19,7 +19,6 @@ class InAppReceiptValidatorTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        // Arrange
         guard let data = Data(base64Encoded: easyPurchaseSandboxReceipt) else {
             return
         }
