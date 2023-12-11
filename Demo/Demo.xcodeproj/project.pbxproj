@@ -31,6 +31,10 @@
 		893778A72ADE5F1600DEF484 /* RestoreViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 893778A62ADE5F1600DEF484 /* RestoreViewModel.swift */; };
 		893778AA2ADFA80E00DEF484 /* ReceiptStateVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 893778A92ADFA80E00DEF484 /* ReceiptStateVC.swift */; };
 		893778AC2ADFA82B00DEF484 /* ReceiptStateViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 893778AB2ADFA82B00DEF484 /* ReceiptStateViewModel.swift */; };
+		8998A6942B232935009EC6A4 /* ReceiptData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8998A6932B232935009EC6A4 /* ReceiptData.swift */; };
+		8998A6972B2330F7009EC6A4 /* PurchaseItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8998A6952B2330F7009EC6A4 /* PurchaseItem.swift */; };
+		8998A6982B2330F7009EC6A4 /* PurchaseItem.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8998A6962B2330F7009EC6A4 /* PurchaseItem.xib */; };
+		8998A69A2B270836009EC6A4 /* InterfaceFunctionalityVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8998A6992B270836009EC6A4 /* InterfaceFunctionalityVC.swift */; };
 		89EA55F42B04BE93009B15E6 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89EA55F32B04BE93009B15E6 /* NetworkManager.swift */; };
 /* End PBXBuildFile section */
 
@@ -79,6 +83,10 @@
 		893778A62ADE5F1600DEF484 /* RestoreViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestoreViewModel.swift; sourceTree = "<group>"; };
 		893778A92ADFA80E00DEF484 /* ReceiptStateVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptStateVC.swift; sourceTree = "<group>"; };
 		893778AB2ADFA82B00DEF484 /* ReceiptStateViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptStateViewModel.swift; sourceTree = "<group>"; };
+		8998A6932B232935009EC6A4 /* ReceiptData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptData.swift; sourceTree = "<group>"; };
+		8998A6952B2330F7009EC6A4 /* PurchaseItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseItem.swift; sourceTree = "<group>"; };
+		8998A6962B2330F7009EC6A4 /* PurchaseItem.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PurchaseItem.xib; sourceTree = "<group>"; };
+		8998A6992B270836009EC6A4 /* InterfaceFunctionalityVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterfaceFunctionalityVC.swift; sourceTree = "<group>"; };
 		89EA55F32B04BE93009B15E6 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -243,6 +251,10 @@
 			children = (
 				893778A92ADFA80E00DEF484 /* ReceiptStateVC.swift */,
 				893778AB2ADFA82B00DEF484 /* ReceiptStateViewModel.swift */,
+				8998A6932B232935009EC6A4 /* ReceiptData.swift */,
+				8998A6952B2330F7009EC6A4 /* PurchaseItem.swift */,
+				8998A6962B2330F7009EC6A4 /* PurchaseItem.xib */,
+				8998A6992B270836009EC6A4 /* InterfaceFunctionalityVC.swift */,
 			);
 			path = ReceiptView;
 			sourceTree = "<group>";
@@ -356,6 +368,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8998A6982B2330F7009EC6A4 /* PurchaseItem.xib in Resources */,
 				84C4775B2ADCF578003A20F7 /* LaunchScreen.storyboard in Resources */,
 				893778892ADE2E1200DEF484 /* ProductCell.xib in Resources */,
 				84C477582ADCF578003A20F7 /* Assets.xcassets in Resources */,
@@ -426,13 +439,16 @@
 			files = (
 				893778A12ADE51DB00DEF484 /* ProductDetailVC.swift in Sources */,
 				893778AC2ADFA82B00DEF484 /* ReceiptStateViewModel.swift in Sources */,
+				8998A6942B232935009EC6A4 /* ReceiptData.swift in Sources */,
 				84C4774F2ADCF577003A20F7 /* AppDelegate.swift in Sources */,
 				893778992ADE3D4600DEF484 /* FetchProductListViewModel.swift in Sources */,
 				893778A72ADE5F1600DEF484 /* RestoreViewModel.swift in Sources */,
+				8998A69A2B270836009EC6A4 /* InterfaceFunctionalityVC.swift in Sources */,
 				893778882ADE2E1200DEF484 /* ProductCell.swift in Sources */,
 				84C477512ADCF577003A20F7 /* SceneDelegate.swift in Sources */,
 				893778942ADE3BF100DEF484 /* ObservableObject.swift in Sources */,
 				893778972ADE3C5200DEF484 /* Message.swift in Sources */,
+				8998A6972B2330F7009EC6A4 /* PurchaseItem.swift in Sources */,
 				893778852ADE2D4400DEF484 /* FetchProductsListVC.swift in Sources */,
 				8937789B2ADE3DD000DEF484 /* IAPHelper.swift in Sources */,
 				893778922ADE3B6700DEF484 /* Constants.swift in Sources */,

@@ -39,6 +39,9 @@ public protocol InAppReceiptValidatorProtocol {
     var allAutoRenewables: [PurchaseData] { get }
     func activeAutoRenewables() throws -> [PurchaseData]
     func isValidReceipt() throws -> Bool
+    func isNonRenewableActive(productIdentifier: String, validForDay day: Int, currentDate: Date) throws -> Bool
+    func isNonRenewableActive(productIdentifier: String, validForMonth month: Int, currentDate: Date) throws -> Bool
+    func isNonRenewableActive(productIdentifier: String, validForYear year: Int, currentDate: Date) throws -> Bool
 }
 
 // MARK: - InAppReceiptValidator Class
@@ -419,5 +422,40 @@ extension InAppReceiptValidator {
             }
         }
         return activeAutoRenews
+    }
+    
+    public func isNonRenewableActive(productIdentifier: String, validForDay day: Int, currentDate: Date) throws -> Bool {
+        let activeDays = day
+        let status = try checkNonRenewableValidaty(productIdentifier: productIdentifier, activeDays: activeDays, currentDate: currentDate)
+        return status
+    }
+    public func isNonRenewableActive(productIdentifier: String, validForMonth month: Int, currentDate: Date) throws -> Bool {
+        let activeDays = month * 30
+        let status = try isNonRenewableActive(productIdentifier: productIdentifier, validForDay: activeDays, currentDate: currentDate)
+        return status
+    }
+    public func isNonRenewableActive(productIdentifier: String, validForYear year: Int, currentDate: Date) throws -> Bool {
+        let activeDays = year * 365
+        let status = try isNonRenewableActive(productIdentifier: productIdentifier, validForDay: activeDays, currentDate: currentDate)
+        return status
+    }
+    
+    private func checkNonRenewableValidaty(productIdentifier: String, activeDays: Int, currentDate: Date) throws -> Bool {
+        if !containsPurchase(ofProductIdentifier: productIdentifier) {
+            throw PurchaseDataError.productNotPurchased
+        }
+        
+        let purchaseItem = allPurchasesByProductId(ofProductIdentifier: productIdentifier).first
+        
+        if purchaseItem?.expiresDate != nil {
+            throw PurchaseDataError.notNonRenewableProduct
+        }
+        guard let purchaseDate = purchaseItem?.purchaseDate else {
+            throw PurchaseDataError.purchaseDateNotAvailable
+        }
+        if (purchaseDate + TimeInterval(activeDays * 24 * 60 * 60)) > currentDate {
+            return true
+        }
+        return false
     }
 }
