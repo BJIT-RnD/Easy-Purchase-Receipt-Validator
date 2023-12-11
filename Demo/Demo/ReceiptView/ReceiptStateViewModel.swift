@@ -12,7 +12,6 @@ final class ReceiptStateViewModel {
     var isReceiptAvailable: ObservableObject<Bool?> = ObservableObject(nil)
 
     func doesAppStoreReceiptExist() -> Bool {
-
         if let receiptString = UserDefaults.standard.string(forKey: Constants.receiptDataKey) {
             return true
         }
@@ -20,7 +19,7 @@ final class ReceiptStateViewModel {
         if let receiptURL = Bundle.main.appStoreReceiptURL,
             FileManager.default.fileExists(atPath: receiptURL.path) {
             isReceiptAvailable.value = true
-            //Access the Reciept data from url and save to user defaults
+            // Access the Reciept data from url and save to user defaults
             do {
                 let receiptData = try Data(contentsOf: receiptURL, options: .alwaysMapped)
                 let recieptString = receiptData.base64EncodedString()
@@ -31,7 +30,7 @@ final class ReceiptStateViewModel {
         }
         return false
     }
-    func refreshReceipt(){
+    func refreshReceipt() {
         IAPHelper.shared.refreshReceipt()
     }
 }
