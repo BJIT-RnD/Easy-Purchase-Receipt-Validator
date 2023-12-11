@@ -17,7 +17,7 @@ final class FetchProductsListVC: UIViewController {
         super.viewDidLoad()
         initialSetup()
         setupBinders()
-        if(NetworkManager.shared.isConnectedToNetwork()) {
+        if NetworkManager.shared.isConnectedToNetwork() {
             FetchProductsListVC.viewModel.getPurchasableProducts()
         } else {
             print("Network error at \(self) please fix the network")
