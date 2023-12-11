@@ -46,7 +46,7 @@ final class IAPHelper: NSObject {
         SKPaymentQueue.default().add(self)
         SKPaymentQueue.default().restoreCompletedTransactions()
     }
-    func refreshReceipt(){
+    func refreshReceipt() {
         let request = SKReceiptRefreshRequest()
         request.delegate = self
         request.start()
