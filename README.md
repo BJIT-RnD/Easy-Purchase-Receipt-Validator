@@ -124,9 +124,9 @@ guard let purchase = receiptData.purchases else { return }
 ```swift
 let opaqueValue = receiptData.opaqueValue
 ```
-6. Accessing Bundle Identifier
+6. Accessing Bundle Identifier Data
 ```swift
-let bundleIdentifier = receiptData.bundleIdentifier
+let bundleIdentifierData = receiptData.bundleIdentifierData
 ```
 7. Accessing receiptHash
 ```swift
