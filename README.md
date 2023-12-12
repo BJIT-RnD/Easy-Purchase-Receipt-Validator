@@ -223,47 +223,47 @@ Atomic: Appropriate when the content is instantly delivered.
     /// - Returns: The list of all the active auto-renewable subscription purchase ever done by the user.
     ///
 
-// MARK: - Non-Renewable Product Validation
+    // MARK: - Non-Renewable Product Validation
 
-/// Determines the validity of a non-renewable product based on a specified number of days.
-///
-/// - Parameters:
-///   - productIdentifier: The identifier of the non-renewable product.
-///   - day: The number of days the product is considered valid.
-///   - currentDate: The current date for comparison.
-/// - Returns: `true` if the product is valid, `false` otherwise.
-/// - Throws: An error if there are issues with product purchase or date calculations.
-public func isNonRenewableActive(productIdentifier: String, validForDay day: Int, currentDate: Date) throws -> Bool 
+    /// Determines the validity of a non-renewable product based on a specified number of days.
+    ///
+    /// - Parameters:
+    ///   - productIdentifier: The identifier of the non-renewable product.
+    ///   - day: The number of days the product is considered valid.
+    ///   - currentDate: The current date for comparison.
+    /// - Returns: `true` if the product is valid, `false` otherwise.
+    /// - Throws: An error if there are issues with product purchase or date calculations.
+    public func isNonRenewableActive(productIdentifier: String, validForDay day: Int, currentDate: Date) throws -> Bool 
 
-/// Determines the validity of a non-renewable product based on a specified number of months.
-///
-/// - Parameters:
-///   - productIdentifier: The identifier of the non-renewable product.
-///   - month: The number of months the product is considered valid.
-///   - currentDate: The current date for comparison.
-/// - Returns: `true` if the product is valid, `false` otherwise.
-/// - Throws: An error if there are issues with product purchase or date calculations.
-public func isNonRenewableActive(productIdentifier: String, validForMonth month: Int, currentDate: Date) throws -> Bool
+    /// Determines the validity of a non-renewable product based on a specified number of months.
+    ///
+    /// - Parameters:
+    ///   - productIdentifier: The identifier of the non-renewable product.
+    ///   - month: The number of months the product is considered valid.
+    ///   - currentDate: The current date for comparison.
+    /// - Returns: `true` if the product is valid, `false` otherwise.
+    /// - Throws: An error if there are issues with product purchase or date calculations.
+    public func isNonRenewableActive(productIdentifier: String, validForMonth month: Int, currentDate: Date) throws -> Bool
 
-/// Determines the validity of a non-renewable product based on a specified number of years.
-///
-/// - Parameters:
-///   - productIdentifier: The identifier of the non-renewable product.
-///   - year: The number of years the product is considered valid.
-///   - currentDate: The current date for comparison.
-/// - Returns: `true` if the product is valid, `false` otherwise.
-/// - Throws: An error if there are issues with product purchase or date calculations.
-public func isNonRenewableActive(productIdentifier: String, validForYear year: Int, currentDate: Date) throws -> Bool
+    /// Determines the validity of a non-renewable product based on a specified number of years.
+    ///
+    /// - Parameters:
+    ///   - productIdentifier: The identifier of the non-renewable product.
+    ///   - year: The number of years the product is considered valid.
+    ///   - currentDate: The current date for comparison.
+    /// - Returns: `true` if the product is valid, `false` otherwise.
+    /// - Throws: An error if there are issues with product purchase or date calculations.
+    public func isNonRenewableActive(productIdentifier: String, validForYear year: Int, currentDate: Date) throws -> Bool
 
-/// Private method for checking the validity of a non-renewable product.
-///
-/// - Parameters:
-///   - productIdentifier: The identifier of the non-renewable product.
-///   - activeDays: The total number of days the product is considered valid.
-///   - currentDate: The current date for comparison.
-/// - Returns: `true` if the product is valid, `false` otherwise.
-/// - Throws: An error if there are issues with product purchase or date calculations.
-private func checkNonRenewableValidity(productIdentifier: String, activeDays: Int, currentDate: Date) throws -> Bool  
+    /// Private method for checking the validity of a non-renewable product.
+    ///
+    /// - Parameters:
+    ///   - productIdentifier: The identifier of the non-renewable product.
+    ///   - activeDays: The total number of days the product is considered valid.
+    ///   - currentDate: The current date for comparison.
+    /// - Returns: `true` if the product is valid, `false` otherwise.
+    /// - Throws: An error if there are issues with product purchase or date calculations.
+    private func checkNonRenewableValidity(productIdentifier: String, activeDays: Int, currentDate: Date) throws -> Bool  
 ```
 ## N.B.
 
