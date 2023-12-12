@@ -152,7 +152,6 @@ let expirationDateString = receiptData.expirationDateString
 
 This part explains how to call different methods of our library which will do specific tasks according to your neccessary.
 
-Atomic: Appropriate when the content is instantly delivered.
 ```swift
     /// Returns the original transaction identifier for the first purchase of a specific product identifier.
     ///
