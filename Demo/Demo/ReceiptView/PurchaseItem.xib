@@ -3,7 +3,7 @@
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21678"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -140,11 +140,11 @@
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
-                <outlet property="Quantity" destination="Jg7-os-BLb" id="Skt-Ph-jl3"/>
                 <outlet property="cancellationDate" destination="ILK-Vk-H6g" id="4j1-Mc-0IX"/>
                 <outlet property="expireDate" destination="cYm-nW-axn" id="wfd-N7-0I6"/>
                 <outlet property="productID" destination="KRR-IH-jAF" id="Edv-aP-l2l"/>
                 <outlet property="purchaseDate" destination="dNF-EX-ugf" id="mzI-qk-2GN"/>
+                <outlet property="quantity" destination="Jg7-os-BLb" id="zOf-gu-JUA"/>
                 <outlet property="view" destination="bZ6-qH-D8c" id="c50-yt-BF3"/>
             </connections>
             <point key="canvasLocation" x="39.694656488549619" y="33.802816901408455"/>
