@@ -3,7 +3,7 @@
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21678"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -447,7 +447,7 @@
                                                 <state key="normal" title="Button"/>
                                                 <buttonConfiguration key="configuration" style="plain" title="Active Auto Renews"/>
                                                 <connections>
-                                                    <action selector="ActiveAutoRenews:" destination="0ZS-Nj-Q1w" eventType="touchUpInside" id="2h5-ak-r3w"/>
+                                                    <action selector="activeAutoRenews:" destination="0ZS-Nj-Q1w" eventType="touchUpInside" id="EDF-pt-pWw"/>
                                                 </connections>
                                             </button>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cgu-zM-lQX">
@@ -473,7 +473,7 @@
                                                 <state key="normal" title="Button"/>
                                                 <buttonConfiguration key="configuration" style="plain" title="Check Valid Expire Date"/>
                                                 <connections>
-                                                    <action selector="CheckValidExpireDate:" destination="0ZS-Nj-Q1w" eventType="touchUpInside" id="liw-Rd-cku"/>
+                                                    <action selector="checkValidExpireDate:" destination="0ZS-Nj-Q1w" eventType="touchUpInside" id="NkJ-5b-CkP"/>
                                                 </connections>
                                             </button>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Status" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="db7-vc-DxB">
