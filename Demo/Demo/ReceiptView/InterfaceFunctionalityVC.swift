@@ -43,7 +43,7 @@ class InterfaceFunctionalityVC: UIViewController {
         checkValidationStatus.text = "\(isValid)"
     }
     
-    @IBAction func CheckValidExpireDate(_ sender: Any) {
+    @IBAction func checkValidExpireDate(_ sender: Any) {
         let isValidExpired = try? receipt?.checkExpirationDateValid()
         checkValidationExpireDate.text = "\(isValidExpired)"
     }
@@ -58,7 +58,7 @@ class InterfaceFunctionalityVC: UIViewController {
         let allPurchaseCount = try? receipt?.allPurchasesByProductId(ofProductIdentifier: id ?? "abc", sortedBy: nil).count
         allPurchaseStatus.text = "\(allPurchaseCount)"
     }
-    @IBAction func ActiveAutoRenews(_ sender: Any) {
+    @IBAction func activeAutoRenews(_ sender: Any) {
         let allActivePurchaseCount = try? receipt?.activeAutoRenewables().count
         activeAutoRenewStatus.text = "\(allActivePurchaseCount)"
     }

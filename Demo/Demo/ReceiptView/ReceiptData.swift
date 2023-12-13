@@ -73,7 +73,7 @@ extension ReceiptData: UITableViewDelegate, UITableViewDataSource {
         }
         cell.view.layer.cornerRadius = 10
         cell.productID.text = purchases[indexPath.row].productIdentifier
-        cell.Quantity.text = (purchases[indexPath.row].quantities)?.description
+        cell.quantity.text = (purchases[indexPath.row].quantities)?.description
         cell.purchaseDate.text = (purchases[indexPath.row].purchaseDate)?.description
         cell.expireDate.text = (purchases[indexPath.row].expiresDate)?.description
         cell.cancellationDate.text = (purchases[indexPath.row].cancellationDate)?.description
