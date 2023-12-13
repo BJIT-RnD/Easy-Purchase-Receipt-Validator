@@ -38,7 +38,6 @@ class ReceiptData: UIViewController {
             do {
                 let appleContainer = try AppleContainer(data: receiptData!)
                 let receiptData = try appleContainer.AppleReceipt()
-                dump(receiptData)
                 bundleIdentifier.text = receiptData.bundleIdentifier
                 bundleVersion.text = receiptData.bundleVersion
                 receiptCreationDate.text = receiptData.creationDateString
