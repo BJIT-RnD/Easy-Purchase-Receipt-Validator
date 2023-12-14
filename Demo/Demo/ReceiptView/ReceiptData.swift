@@ -16,7 +16,6 @@ class ReceiptData: UIViewController {
     @IBOutlet weak var receiptCreationDate: UILabel!
     @IBOutlet weak var bundleVersion: UILabel!
     @IBOutlet weak var bundleIdentifier: UILabel!
-    @IBOutlet weak var receiptExpireDate: UILabel!
     
     var purchases: [PurchaseData] = []
     override func viewDidLoad() {
@@ -41,7 +40,6 @@ class ReceiptData: UIViewController {
                 bundleIdentifier.text = receiptData.bundleIdentifier
                 bundleVersion.text = receiptData.bundleVersion
                 receiptCreationDate.text = receiptData.creationDateString
-                receiptExpireDate.text = receiptData.expirationDateString
                 guard let purchase = receiptData.purchases else { return }
                 totalPurchaseCount.text = "\(String(describing: purchase.count))"
                 purchases = receiptData.purchases!
@@ -75,7 +73,6 @@ extension ReceiptData: UITableViewDelegate, UITableViewDataSource {
         cell.quantity.text = (purchases[indexPath.row].quantities)?.description
         cell.purchaseDate.text = (purchases[indexPath.row].purchaseDate)?.description
         cell.expireDate.text = (purchases[indexPath.row].expiresDate)?.description
-        cell.cancellationDate.text = (purchases[indexPath.row].cancellationDate)?.description
         return cell
     }
 }
