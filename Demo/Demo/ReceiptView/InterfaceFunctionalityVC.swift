@@ -10,7 +10,6 @@ import Easy_Purchase_Receipt_Validator
 
 class InterfaceFunctionalityVC: UIViewController {
     @IBOutlet weak var checkValidationStatus: UILabel!
-    @IBOutlet weak var checkValidationExpireDate: UILabel!
     @IBOutlet weak var ifContainStatus: UILabel!
     @IBOutlet weak var allPurchaseStatus: UILabel!
     @IBOutlet weak var activeAutoRenewStatus: UILabel!
@@ -41,11 +40,6 @@ class InterfaceFunctionalityVC: UIViewController {
     @IBAction func checkValidation(_ sender: Any) {
         let isValid = try? receipt?.isValidReceipt()
         checkValidationStatus.text = "\(isValid)"
-    }
-    
-    @IBAction func checkValidExpireDate(_ sender: Any) {
-        let isValidExpired = try? receipt?.checkExpirationDateValid()
-        checkValidationExpireDate.text = "\(isValidExpired)"
     }
     
     @IBAction func checkIfContain(_ sender: Any) {

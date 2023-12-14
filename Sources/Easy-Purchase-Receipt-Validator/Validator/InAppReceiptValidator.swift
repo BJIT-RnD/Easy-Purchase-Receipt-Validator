@@ -28,7 +28,6 @@ public protocol InAppReceiptValidatorProtocol {
     var creationDateString: String? { get }
     var expirationDateString: String? { get }
     var purchases: [PurchaseData]? { get }
-    func checkExpirationDateValid() -> Bool
     func originalTransactionIdentifier(ofProductIdentifier productIdentifier: String) -> String?
     func containsPurchase(ofProductIdentifier productIdentifier: String) -> Bool
     func getPurchaseExpiredDatebyProductId(ofProductIdentifier productIdentifier: String) throws -> Date?
@@ -168,22 +167,6 @@ public extension InAppReceiptValidator {
         guard let version = Bundle.main.bundleVersion, version == bundleVersion else {
             throw ValidationError.validationFailed(reason: .bundleVersionVerification)
         }
-    }
-
-    /// Checks the validity of the expiration date in comparison to the current date.
-    ///
-    /// This function compares the expiration date extracted from the processed final payload
-    /// with the current date to determine if the receipt is still valid or has expired.
-    ///
-    /// - Returns: `true` if the expiration date is greater than or equal to the current date,
-    /// indicating that the receipt is still valid. Returns `false` if the expiration date is earlier
-    /// than the current date, indicating that the receipt has expired.
-    func checkExpirationDateValid() -> Bool {
-        let currentDate = Date()
-
-        guard let expirationDate = processedFinalPayload.receiptExpirationDate else { return false }
-
-        return expirationDate >= currentDate
     }
 
     /// Verify the hash of the computed data against the stored receipt hash.
