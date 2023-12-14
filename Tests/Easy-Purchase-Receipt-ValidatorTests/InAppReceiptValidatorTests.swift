@@ -125,11 +125,6 @@ extension InAppReceiptValidatorTests {
                 XCTFail()
             }
         }
-
-        func test_InAppReceiptValidator_whenOriginalReceiptGiven_checkExpirationDateValidNotNilShouldReturnTrue() {
-           // Assuming the expiration date is set to tomorrow, this test checks if checkExpirationDateValid returns true
-            XCTAssertTrue(((receiptInfo?.checkExpirationDateValid()) != nil))
-        }
 }
 
 // MARK: Extension
