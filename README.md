@@ -1,5 +1,5 @@
 # Easy Purchase Reciept Validator
-![Receipt Validator](IAP_Validation_Banner.png)
+![Receipt Validator](https://github.com/BJIT-RnD/Easy-Purchase-Receipt-Validator/blob/main/IAP_Validation_Banner.png)
 
 **Easy Purchase Reciept Validator** is a minimalistic, entirely Swift-based library designed for locally interpreting and authenticating Apple In-App Purchase Receipts.
 
