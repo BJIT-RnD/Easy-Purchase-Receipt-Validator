@@ -16,7 +16,7 @@ Pod::Spec.new do |spec|
   #
 
   spec.name         = "Easy_Purchase_Receipt_Validator"
-  spec.version      = "1.0.1"
+  spec.version      = "1.0.2"
   spec.summary      = "This is a minimalistic, entirely Swift-based library designed for locally interpreting and authenticating Apple In-App Purchase Receipts."
 
   # This description is used to generate tags and improve search results.
@@ -41,7 +41,7 @@ Pod::Spec.new do |spec|
   spec.author        = { "BJIT" => "rnd@bjitgroup.com" }
   #spec.documentation_url = "https://github.com/BJIT-RnD/EasyPurchase#cocoapods"
   spec.platform      = :ios, "11.0"
-  spec.source        = { :git => "https://github.com/BJIT-RnD/Easy-Purchase-Receipt-Validator.git", :tag => "1.0.1" }
+  spec.source        = { :git => "https://github.com/BJIT-RnD/Easy-Purchase-Receipt-Validator.git", :tag => "1.0.2" }
   spec.source_files  = "Sources/Easy-Purchase-Receipt-Validator/**/*"
   spec.requires_arc  = true
   spec.swift_version = "5.0"
